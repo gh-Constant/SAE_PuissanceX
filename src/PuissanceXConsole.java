@@ -5,7 +5,7 @@ import control.HoleController;
 import boardifier.control.StageFactory;
 import boardifier.model.Model;
 
-public class HoleConsole {
+public class PuissanceXConsole {
 
     public static void main(String[] args) {
 
