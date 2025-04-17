@@ -50,86 +50,40 @@ public class HoleStageModel extends GameStageModel {
         setupCallbacks();
     }
 
-    //Uncomment this 2 methods if example with a main container is used
-    /*
-    public ContainerElement getMainContainer() {
-        return mainContainer;
-    }
-
-    public void setMainContainer(ContainerElement mainContainer) {
-        this.mainContainer = mainContainer;
-        addContainer(mainContainer);
-    }
-     */
-
     public HoleBoard getBoard() {
         return board;
-    }
-    public void setBoard(HoleBoard board) {
-        this.board = board;
-        addContainer(board);
     }
 
     public HolePawnPot getBlackPot() {
         return blackPot;
     }
-    public void setBlackPot(HolePawnPot blackPot) {
-        this.blackPot = blackPot;
-        addContainer(blackPot);
-    }
 
     public HolePawnPot getRedPot() {
         return redPot;
-    }
-    public void setRedPot(HolePawnPot redPot) {
-        this.redPot = redPot;
-        addContainer(redPot);
     }
 
     public Pawn[] getBlackPawns() {
         return blackPawns;
     }
-    public void setBlackPawns(Pawn[] blackPawns) {
-        this.blackPawns = blackPawns;
-        for(int i=0;i<blackPawns.length;i++) {
-            addElement(blackPawns[i]);
-        }
-    }
 
     public Pawn[] getRedPawns() {
         return redPawns;
-    }
-    public void setRedPawns(Pawn[] redPawns) {
-        this.redPawns = redPawns;
-        for(int i=0;i<redPawns.length;i++) {
-            addElement(redPawns[i]);
-        }
     }
 
     public TextElement getPlayerName() {
         return playerName;
     }
-    public void setPlayerName(TextElement playerName) {
-        this.playerName = playerName;
-        addElement(playerName);
-    }
-
+    /*
+    TO FULFILL:
+        - create setters for all attributes. NB: in setters, do not forget to add elements to the stage (see addGrid() & addElement())
+     */
 
     private void setupCallbacks() {
-        onPutInContainer( (element, gridDest, rowDest, colDest) -> {
-            // just check when pawns are put in 3x3 board
-            if (gridDest != board) return;
-            Pawn p = (Pawn) element;
-            if (p.getColor() == 0) {
-                blackPawnsToPlay--;
-            }
-            else {
-                redPawnsToPlay--;
-            }
-            if ((blackPawnsToPlay == 0) && (redPawnsToPlay == 0)) {
-                computePartyResult();
-            }
-        });
+
+    /*
+    TO FULFILL:
+        - setup the onPutInGrid callback in order to decrease the number of pawns to play, and eventually to get the party result
+     */
     }
 
     private void computePartyResult() {

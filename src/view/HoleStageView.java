@@ -41,47 +41,12 @@ public class HoleStageView extends GameStageView {
     public void createLooks() {
         HoleStageModel model = (HoleStageModel)gameStageModel;
 
-        /* Creating all the looks for all the game elements that are created by
-           the HoleStageFactory.
-           WARNING ! If there is a game element that has no associated look, the execution
-           will fail.
-
-           NB1: no need to put the pawn looks within the pot looks: boardifier handles that itself, provided
-           pawn elements are put within their pot element (which is the case in HoleStageFactory)
-
-           NB2: the real location of pawn looks within the pot looks is also managed directly by boardifier. This
-           location takes the paddings & alignments into account.
-           This is also why the initial location for the pawn elements is meaningless.
-         */
-        // create a TextLook for the text element
-        addLook(new TextLook(model.getPlayerName()));
-        // create a ClassicBoardLook (with borders and coordinates) for the main board.
-        addLook(new ClassicBoardLook(2, 4, model.getBoard(), 1, 1, true));
-        // create looks for both pots
-        addLook(new BlackPawnPotLook(model.getBlackPot()));
-        addLook(new RedPawnPotLook(2, 4, model.getRedPot()));
-        // create looks for all pawns
-        for(int i=0;i<4;i++) {
-            addLook(new PawnLook(model.getBlackPawns()[i]));
-            addLook(new PawnLook(model.getRedPawns()[i]));
-        }
-
-
         /*
-        Example using a main container (see HoleStageFactory),
-
-
-        // create a look for the main container element, with flexible cell size and no borders
-        // NB: no need to recreate spanning for the container look: they are deduced from the main container element
-        ContainerLook mainLook = new ContainerLook(model.getMainContainer(), -1);
-        // set padding to 1
-        mainLook.setPadding(1);
-        // center the looks within the cells
-        mainLook.setVerticalAlignment(ContainerLook.ALIGN_MIDDLE);
-        mainLook.setHorizontalAlignment(ContainerLook.ALIGN_CENTER);
-        // add the look to the gane stage view.
-        addLook(mainLook);
-        */
-        Logger.debug("finished creating game stage looks", this);
+        TO FULFILL:
+            using the model of the board, pots and pawns
+            - create & add the look of the main board using an instance of ClassicBoardLook, with cells of size 4x2
+            - create & add the look of the two pots using instances of PawnPotLook with cells of size 4x2
+            - crate & add the look of the 8 pawns
+         */
     }
 }
