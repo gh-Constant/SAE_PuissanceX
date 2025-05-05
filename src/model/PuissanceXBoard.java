@@ -12,8 +12,8 @@ public class PuissanceXBoard extends ContainerElement {
     
     public PuissanceXBoard(int x, int y, int rows, int cols, int winCondition, GameStageModel gameStageModel) {
         super("puissancexboard", x, y, rows, cols, gameStageModel);
-        // Initialisation
+        //TODO Initialisation
     }
     
-    // Méthodes pour gérer les cellules valides et vérifier les conditions de victoire
+    //TODO Méthodes pour gérer les cellules valides et vérifier les conditions de victoire
 }

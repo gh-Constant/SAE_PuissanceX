@@ -14,6 +14,6 @@ public class PuissanceXStageFactory extends StageElementsFactory {
     
     @Override
     public void setup() {
-        // Création de tous les éléments du jeu
+        //TODO Création de tous les éléments du jeu
     }
 }

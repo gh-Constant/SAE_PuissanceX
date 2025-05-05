@@ -19,10 +19,10 @@ public class PuissanceXLevel extends GameStageModel {
     
     public PuissanceXLevel(String name, Model model) {
         super(name, model);
-        // Initialisation et callbacks
+        //TODO Initialisation et callbacks
     }
     
-    // Getters et setters
+    //TODO Getters et setters
     
     @Override
     public StageElementsFactory getDefaultElementFactory() {

@@ -13,7 +13,7 @@ public class PuissanceXController extends Controller {
     
     public PuissanceXController(Model model, View view, int boardRows, int boardCols, int winCondition) {
         super(model, view);
-        // Initialisation
+        // TODO Initialisation
         this.boardRows = boardRows;
         this.boardCols = boardCols;
         this.winCondition = winCondition;
@@ -21,8 +21,8 @@ public class PuissanceXController extends Controller {
     
     @Override
     public void stageLoop() {
-        // Logique principale du jeu
+        //TODO Logique principale du jeu
     }
     
-    // Méthodes pour gérer les tours, les mouvements et la fin de partie
+    //TODO Méthodes pour gérer les tours, les mouvements et la fin de partie
 }
