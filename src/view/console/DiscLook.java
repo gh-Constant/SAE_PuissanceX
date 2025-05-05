@@ -22,8 +22,7 @@ public class DiscLook extends ElementLook {
     public void onSelectionChange() {
         // TODO: Changer l'apparence quand le jeton est sélectionné
     }
-    
-    @Override
+
     public void onPutInContainer() {
         // TODO: Ajuster l'apparence quand le jeton est placé dans un conteneur
     }

@@ -5,6 +5,7 @@ import boardifier.model.GameStageModel;
 import boardifier.model.Model;
 import boardifier.model.StageElementsFactory;
 import boardifier.model.TextElement;
+import org.w3c.dom.Text;
 
 public class PuissanceXLevel extends GameStageModel {
     // Éléments du jeu
@@ -18,13 +19,52 @@ public class PuissanceXLevel extends GameStageModel {
     private int cols;
     private int winCondition;
     
+    public PuissanceXLevel(String name, Model model, int rows, int cols, int winCondition) {
+        super(name, model);
+        
+        // Stocker les paramètres du jeu
+        this.rows  = rows;
+        this.cols = cols;
+        this.winCondition = winCondition;
+        
+        // Initialiser les tableaux pour les pots et les jetons
+        int nbPlayers = model.getPlayers().size();
+        playerPots = new PuissanceXPot[nbPlayers];
+        
+        // Calculer le nombre de jetons nécessaires par joueur (moitié du plateau + 1 pour arrondir)
+        int nbDiscsPerPlayer = (rows * cols + 1) / 2;
+        playerDiscs = new Disc[nbPlayers][nbDiscsPerPlayer];
+        
+        // Créer l'élément texte pour afficher le joueur actif
+        playerName = new TextElement(model.getCurrentPlayerName(), this);
+        
+        Logger.info("PuissanceXLevel initialized with " + rows + "x" + cols + 
+                   " board, win condition: " + winCondition);
+    }
+    
+    // Constructeur par défaut utilisant GameConfig pour récupérer les paramétres du jeu
+    
     public PuissanceXLevel(String name, Model model) {
         super(name, model);
         
-        // TODO: Initialisation
-        // 1. Récupérer les paramètres du jeu (rows, cols, winCondition)
-        // 2. Initialiser les tableaux pour les pots et les jetons
-        // 3. Créer l'élément texte pour afficher le joueur actif
+        // Récupérer les paramètres du jeu depuis GameConfig
+        this.rows = GameConfig.getBoardRows();
+        this.cols = GameConfig.getBoardCols();
+        this.winCondition = GameConfig.getWinCondition();
+        
+        // Initialiser les tableaux pour les pots et les jetons
+        int nbPlayers = model.getPlayers().size();
+        playerPots = new PuissanceXPot[nbPlayers];
+        
+        // Calculer le nombre de jetons nécessaires par joueur (moitié du plateau + 1 pour arrondir)
+        int nbDiscsPerPlayer = (rows * cols + 1) / 2;
+        playerDiscs = new Disc[nbPlayers][nbDiscsPerPlayer];
+        
+        // Créer l'élément texte pour afficher le joueur actif
+        playerName = new TextElement(model.getCurrentPlayerName(), this);
+        
+        Logger.info("PuissanceXLevel initialized with " + rows + "x" + cols + 
+                   " board, win condition: " + winCondition);
     }
     
     /**
