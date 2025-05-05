@@ -19,10 +19,19 @@ public class PuissanceXLevel extends GameStageModel {
     
     public PuissanceXLevel(String name, Model model) {
         super(name, model);
-        //TODO Initialisation et callbacks
+        
+        // TODO: Initialisation
+        // 1. Récupérer les paramètres du jeu (rows, cols, winCondition)
+        // 2. Initialiser les tableaux pour les pots et les jetons
+        // 3. Créer l'élément texte pour afficher le joueur actif
+        
+        // TODO: Callbacks
+        // 1. Ajouter un écouteur pour mettre à jour le texte quand le joueur change
     }
     
-    //TODO Getters et setters
+    // TODO: Getters et setters
+    // 1. Créer les getters/setters pour board, playerPots, playerDiscs, playerName
+    // 2. Créer les getters pour rows, cols, winCondition
     
     @Override
     public StageElementsFactory getDefaultElementFactory() {
