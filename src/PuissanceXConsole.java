@@ -56,9 +56,25 @@ public class PuissanceXConsole {
         }
 
         Model model = new Model();
+        
+        // Ajout des joueurs selon le mode de jeu
+        switch (GAME_MODE) {
+            case 0: // Humain vs Humain
+                model.addHumanPlayer("Joueur 1");
+                model.addHumanPlayer("Joueur 2");
+                break;
+            case 1: // Humain vs IA
+                model.addHumanPlayer("Joueur 1");
+                model.addComputerPlayer("Ordinateur");
+                break;
+            case 2: // IA vs IA
+                model.addComputerPlayer("Ordinateur 1");
+                model.addComputerPlayer("Ordinateur 2");
+                break;
+        }
+        
         /*
         TO FULFILL:
-            - add both players to model taking mode value into account
             - register the model and view class names (i.e model.HoleStageModel & view.HoleStageView
             - create the controller
             - set the name of the first stage to use when starting the game
