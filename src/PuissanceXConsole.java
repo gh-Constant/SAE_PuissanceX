@@ -1,7 +1,9 @@
 import boardifier.model.GameException;
 import boardifier.view.View;
+import control.PuissanceXController;
 import boardifier.control.StageFactory;
 import boardifier.model.Model;
+import boardifier.control.Controller;
 import boardifier.control.Logger;
 
 public class PuissanceXConsole {
@@ -11,7 +13,7 @@ public class PuissanceXConsole {
     private static int WIN_CONDITION = 4; // default value
     private static int GAME_MODE = 0;      // 0: Human vs Human, 1: Human vs AI, 2: AI vs AI
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws GameException {
         // Set logger level to INFO
         Logger.setLevel(Logger.LOGGER_INFO);
         
@@ -75,12 +77,28 @@ public class PuissanceXConsole {
         
         /*
         TO FULFILL:
-            - register the model and view class names (i.e model.HoleStageModel & view.HoleStageView
-            - create the controller
-            - set the name of the first stage to use when starting the game
-            - start the game
-            - start the stage loop.
+            - register the model and view class names (i.e model.HoleStageModel & view.HoleStageView (finished)
+            - create the controller (finished)
+            - set the name of the first stage to use when starting the game (idk what to do)
+            - start the game (finished)
+            - start the stage loop. (finished)
          */
+
+        
+        // Register the model and view class names (i.e model.HoleStageModel & view.HoleStageView
+        StageFactory.registerModelAndView("PuissanceX", "model.PuissanceXStageModel", "view.PuissanceXStageView");
+
+        // Create the controller
+        Controller control = new PuissanceXController(model, new View(model), BOARD_ROWS, BOARD_COLS, WIN_CONDITION);
+
+        // TODO : Set the name of the first stage to use when starting the game
+        control.setFirstStageName("jsp");
+
+        // Start the game
+        control.startGame();
+
+        // Start the stage loop
+        control.stageLoop();
     }
 
     // Getter methods for game parameters
