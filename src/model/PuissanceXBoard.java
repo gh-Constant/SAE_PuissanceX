@@ -12,13 +12,9 @@ public class PuissanceXBoard extends ContainerElement {
     
     public PuissanceXBoard(int x, int y, int rows, int cols, int winCondition, GameStageModel gameStageModel) {
         super("puissancexboard", x, y, rows, cols, gameStageModel);
-        
-        // Store dimensions and win condition
         this.rows = rows;
         this.cols = cols;
         this.winCondition = winCondition;
-        
-        // Initialize the grid (already done by ContainerElement constructor)
     }
     
     /**
@@ -51,10 +47,7 @@ public class PuissanceXBoard extends ContainerElement {
      * @return true if a disc can be placed in this column, false otherwise
      */
     public boolean isValidColumn(int col) {
-        // TODO: Vérifier si la colonne est valide
-        // 1. Vérifier si la colonne est dans les limites du plateau
-        // 2. Vérifier si la colonne n'est pas pleine
-        return false;
+        return this.isEmptyAt(rows, col);
     }
     
     /**
@@ -63,10 +56,164 @@ public class PuissanceXBoard extends ContainerElement {
      * @return The row index, or -1 if the column is full
      */
     public int getFirstAvailableRow(int col) {
-        // TODO: Trouver la première ligne disponible dans une colonne
-        // 1. Parcourir la colonne de bas en haut
-        // 2. Retourner l'indice de la première cellule vide
+        for (int row = rows - 1; row >= 0; --row) {
+            if (this.isEmptyAt(row, col)) {
+                return row;
+            }
+        }
         return -1;
+    }
+
+    /**
+     * Checks if there is a winner starting from a specific position horizontaly.
+     * @param row The row of the last placed disc
+     * @param col The column of the last placed disc
+     * @param playerId The ID of the player who placed the disc
+     * @return true if the player has won, false otherwise
+     */
+    public boolean checkHorizontal(int row, int col, int playerId) {
+        int count = 0;
+        int prevElement = -1;
+        for (int i = 0; i < cols; i++) {
+            if (this.isEmptyAt(row, i)) {
+                break;
+            }
+            if (this.getElement(row, i).getType() == prevElement) {
+                count++;
+            } else {
+                count = 1;
+                prevElement = this.getElement(row, i).getType();
+            }
+            if (count == winCondition && this.getElement(row, i).getType() == playerId) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Checks if there is a winner starting from a specific position verticaly.
+     * @param row The row of the last placed disc
+     * @param col The column of the last placed disc
+     * @param playerId The ID of the player who placed the disc
+     * @return true if the player has won, false otherwise
+     */
+    public boolean checkVertical(int row, int col, int playerId) {
+        int count = 0;
+        int prevElement = -1;
+        for (int i = 0; i < rows; i++) {
+            if (this.isEmptyAt(i, col)) {
+                break;
+            }
+            if (this.getElement(i, col).getType() == prevElement) {
+                count++;
+            } else {
+                count = 1;
+                prevElement = this.getElement(i, col).getType();
+            }
+            if (count == winCondition && this.getElement(i, col).getType() == playerId) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Checks if there is a winner starting from a specific position diagonally (/ direction).
+     * @param row The row of the last placed disc
+     * @param col The column of the last placed disc
+     * @param playerId The ID of the player who placed the disc
+     * @return true if the player has won, false otherwise
+     */
+    public boolean checkDiagonal1(int row, int col, int playerId) {
+        int count = 0;
+        int prevElement = -1;
+        int r = row;
+        int c = col;
+
+        while (r >= 0 && c >= 0) {
+            if (this.isEmptyAt(r, c)) {
+                break;
+            }
+            if (this.getElement(r, c).getType() == prevElement) {
+                count++;
+            } else {
+                count = 1;
+                prevElement = this.getElement(r, c).getType();
+            }
+            if (count == winCondition && this.getElement(r, c).getType() == playerId) {
+                return true;
+            }
+            r--;
+            c--;
+        }
+
+        r = row + 1;
+        c = col + 1;
+        while (r < rows && c < cols) {
+            if (this.isEmptyAt(r, c)) break;
+            if (this.getElement(r, c).getType() == prevElement) {
+                count++;
+            } else {
+                count = 1;
+                prevElement = this.getElement(r, c).getType();
+            }
+            if (count == winCondition && this.getElement(r, c).getType() == playerId) {
+                return true;
+            }
+            r++;
+            c++;
+        }
+
+        return false;
+    }
+
+    /**
+     * Checks if there is a winner starting from a specific position diagonally (\ direction).
+     * @param row The row of the last placed disc
+     * @param col The column of the last placed disc
+     * @param playerId The ID of the player who placed the disc
+     * @return true if the player has won, false otherwise
+     */
+    public boolean checkDiagonal2(int row, int col, int playerId) {
+        int count = 0;
+        int prevElement = -1;
+
+        int r = row;
+        int c = col;
+        while (r >= 0 && c < cols) {
+            if (this.isEmptyAt(r, c)) break;
+            if (this.getElement(r, c).getType() == prevElement) {
+                count++;
+            } else {
+                count = 1;
+                prevElement = this.getElement(r, c).getType();
+            }
+            if (count == winCondition && this.getElement(r, c).getType() == playerId) {
+                return true;
+            }
+            r--;
+            c++;
+        }
+
+        r = row + 1;
+        c = col - 1;
+        while (r < rows && c >= 0) {
+            if (this.isEmptyAt(r, c)) break;
+            if (this.getElement(r, c).getType() == prevElement) {
+                count++;
+            } else {
+                count = 1;
+                prevElement = this.getElement(r, c).getType();
+            }
+            if (count == winCondition && this.getElement(r, c).getType() == playerId) {
+                return true;
+            }
+            r++;
+            c--;
+        }
+
+        return false;
     }
     
     /**
@@ -77,12 +224,10 @@ public class PuissanceXBoard extends ContainerElement {
      * @return true if the player has won, false otherwise
      */
     public boolean checkWin(int row, int col, int playerId) {
-        // TODO: Vérifier s'il y a un gagnant
-        // 1. Vérifier l'alignement horizontal
-        // 2. Vérifier l'alignement vertical
-        // 3. Vérifier l'alignement diagonal (/)
-        // 4. Vérifier l'alignement diagonal (\)
-        return false;
+        return this.checkHorizontal(row, col, playerId) 
+                || this.checkVertical(row, col, playerId) 
+                || this.checkDiagonal1(row, col, playerId) 
+                || this.checkDiagonal2(row, col, playerId);
     }
     
     /**
