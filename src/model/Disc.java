@@ -12,7 +12,7 @@ public class Disc extends GameElement {
     
     public Disc(int color, GameStageModel gameStageModel) {
         super(gameStageModel);
-        // Enregistrement du type et initialisation
+        //TODO Enregistrement du type et initialisation
     }
     
     // Getters

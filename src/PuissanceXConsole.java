@@ -3,13 +3,14 @@ import boardifier.view.View;
 import boardifier.control.StageFactory;
 import boardifier.model.Model;
 import boardifier.control.Logger;
+import java.util.Arrays;
 
 public class PuissanceXConsole {
     // Game parameters
     private static int BOARD_ROWS = 6;    // default value
     private static int BOARD_COLS = 7;    // default value
     private static int WIN_CONDITION = 4; // default value
-    private static int GAME_MODE = 0;      // 0: Human vs Human, 1: Human vs AI, 2: AI vs AI
+    private static int GAME_MODE = 0;     // 0: Human vs Human, 1: Human vs AI, 2: AI vs AI
 
     public static void main(String[] args) {
         // Set logger level to INFO
@@ -55,32 +56,49 @@ public class PuissanceXConsole {
                       ", Mode: " + GAME_MODE);
         }
 
+        // Create the model that will manage game state
         Model model = new Model();
         
-        // Ajout des joueurs selon le mode de jeu
+        // Add players based on game mode
         switch (GAME_MODE) {
-            case 0: // Humain vs Humain
+            case 0: // Human vs Human
                 model.addHumanPlayer("Joueur 1");
                 model.addHumanPlayer("Joueur 2");
                 break;
-            case 1: // Humain vs IA
+            case 1: // Human vs AI
                 model.addHumanPlayer("Joueur 1");
                 model.addComputerPlayer("Ordinateur");
                 break;
-            case 2: // IA vs IA
+            case 2: // AI vs AI
                 model.addComputerPlayer("Ordinateur 1");
                 model.addComputerPlayer("Ordinateur 2");
                 break;
         }
+
+        // Register model and view classes for the game stage
+        // This allows the framework to create instances dynamically
+        StageFactory.registerModelAndView("puissanceXStage", "model.PuissanceXStageModel", "view.PuissanceXStageView");
+
+        // Create the view that will display the game
+        View view = new View(model);
         
-        /*
-        TO FULFILL:
-            - register the model and view class names (i.e model.HoleStageModel & view.HoleStageView
-            - create the controller
-            - set the name of the first stage to use when starting the game
-            - start the game
-            - start the stage loop.
-         */
+        // Create the controller that will manage game logic
+        control.PuissanceXController controller = new control.PuissanceXController(model, view, BOARD_ROWS, BOARD_COLS, WIN_CONDITION);
+
+        // Set the first stage to be used when starting the game
+        controller.setFirstStageName("puissanceXStage");
+
+        // Start the game (creates the first stage)
+        try {
+            controller.startGame();
+        } catch (GameException e) {
+            Logger.info("Failed to start game: " + e.getMessage());
+            Logger.debug("Stack trace: " + Arrays.toString(e.getStackTrace()));
+            return;
+        }
+
+        // Start the main game loop
+        controller.stageLoop();
     }
 
     // Getter methods for game parameters
