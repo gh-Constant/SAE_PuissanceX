@@ -1,7 +1,9 @@
 import boardifier.model.GameException;
 import boardifier.view.View;
+import control.PuissanceXController;
 import boardifier.control.StageFactory;
 import boardifier.model.Model;
+import boardifier.control.Controller;
 import boardifier.control.Logger;
 import java.util.Arrays;
 
@@ -12,7 +14,7 @@ public class PuissanceXConsole {
     private static int WIN_CONDITION = 4; // default value
     private static int GAME_MODE = 0;     // 0: Human vs Human, 1: Human vs AI, 2: AI vs AI
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws GameException {
         // Set logger level to INFO
         Logger.setLevel(Logger.LOGGER_INFO);
         

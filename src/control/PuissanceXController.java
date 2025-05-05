@@ -13,7 +13,10 @@ public class PuissanceXController extends Controller {
     
     public PuissanceXController(Model model, View view, int boardRows, int boardCols, int winCondition) {
         super(model, view);
-        //TODO Initialisation
+        // TODO Initialisation
+        this.boardRows = boardRows;
+        this.boardCols = boardCols;
+        this.winCondition = winCondition;
     }
     
     @Override
