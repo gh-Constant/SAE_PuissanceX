@@ -12,105 +12,96 @@ public class PuissanceXBoard extends ContainerElement {
     
     public PuissanceXBoard(int x, int y, int rows, int cols, int winCondition, GameStageModel gameStageModel) {
         super("puissancexboard", x, y, rows, cols, gameStageModel);
+        
+        // Store dimensions and win condition
         this.rows = rows;
         this.cols = cols;
         this.winCondition = winCondition;
+        
+        // Initialize the grid (already done by ContainerElement constructor)
     }
     
-    // TODO: Méthodes pour la gestion du jeu
-    // 1. Vérifier si une colonne est valide pour placer un jeton
-    // 2. Trouver la première ligne disponible dans une colonne
-    // 3. Vérifier s'il y a un gagnant (alignements horizontaux, verticaux, diagonaux)
-    // 4. Vérifier si la grille est pleine (match nul)
-
-
-    // Methods
-
-    public boolean isColValid(int col) {
-        return this.isEmptyAt(rows, col);
+    /**
+     * Gets the number of rows in the board.
+     * @return The number of rows
+     */
+    public int getRows() {
+        return rows;
     }
-
-    public int getFirstAvailableRowInCol(int col) {
-        for (int row = rows - 1; row >= 0; --row) {
-            if (this.isEmptyAt(row, col)) {
-                return row;
-            }
-        }
+    
+    /**
+     * Gets the number of columns in the board.
+     * @return The number of columns
+     */
+    public int getCols() {
+        return cols;
+    }
+    
+    /**
+     * Gets the win condition (number of discs in a row needed to win).
+     * @return The win condition
+     */
+    public int getWinCondition() {
+        return winCondition;
+    }
+    
+    /**
+     * Checks if a column is valid for placing a disc.
+     * @param col The column to check
+     * @return true if a disc can be placed in this column, false otherwise
+     */
+    public boolean isValidColumn(int col) {
+        // TODO: Vérifier si la colonne est valide
+        // 1. Vérifier si la colonne est dans les limites du plateau
+        // 2. Vérifier si la colonne n'est pas pleine
+        return false;
+    }
+    
+    /**
+     * Finds the first available row in a column.
+     * @param col The column to check
+     * @return The row index, or -1 if the column is full
+     */
+    public int getFirstAvailableRow(int col) {
+        // TODO: Trouver la première ligne disponible dans une colonne
+        // 1. Parcourir la colonne de bas en haut
+        // 2. Retourner l'indice de la première cellule vide
         return -1;
     }
-
-    public boolean verifHorizontal(){
-        for (int row = 0; row < rows; row++) {
-            int count = 0;
-            int prevElement = -1;
-            for (int col = 0; col < cols; col++) {
-                if (this.isEmptyAt(row, col)) {
-                    break;
-                }
-                if (this.getElement(row, col).getType() == prevElement) {
-                    count++;
-                } else {
-                    count = 1;
-                    prevElement = this.getElement(row, col).getType();
-                }
-                if (count == winCondition) return true;
-            }
-        }
+    
+    /**
+     * Checks if there is a winner starting from a specific position.
+     * @param row The row of the last placed disc
+     * @param col The column of the last placed disc
+     * @param playerId The ID of the player who placed the disc
+     * @return true if the player has won, false otherwise
+     */
+    public boolean checkWin(int row, int col, int playerId) {
+        // TODO: Vérifier s'il y a un gagnant
+        // 1. Vérifier l'alignement horizontal
+        // 2. Vérifier l'alignement vertical
+        // 3. Vérifier l'alignement diagonal (/)
+        // 4. Vérifier l'alignement diagonal (\)
         return false;
     }
-
-    public boolean verifVertical(){
-        for (int col = 0; col < cols; col++) {
-            int count = 0;
-            int prevElement = -1;
-            for (int row = 0; row < rows; row++) {
-                if (this.isEmptyAt(row, col)) {
-                    break;
-                }
-                if (this.getElement(row, col).getType() == prevElement) {
-                    count++;
-                } else {
-                    count = 1;
-                    prevElement = this.getElement(row, col).getType();
-                }
-                if (count == winCondition) return true;
-            }
-        }
+    
+    /**
+     * Checks if the board is full (draw).
+     * @return true if the board is full, false otherwise
+     */
+    public boolean isFull() {
+        // TODO: Vérifier si la grille est pleine
+        // 1. Parcourir toutes les colonnes
+        // 2. Vérifier si au moins une colonne n'est pas pleine
         return false;
     }
-
-    public boolean verifDiagonal(){
-        for (int row = 0; row <= rows - winCondition; ++row) {
-            int count = 0;
-            int prevElement = -1;
-            for (int col = 0; col <= cols - winCondition; col++) {
-                if (this.isEmptyAt(row + count, col + count)) break;
-                if (this.getElement(row + count, col + count).getType() == prevElement) {
-                    count++;
-                } else {
-                    count = 1;
-                    prevElement = this.getElement(row + count, col + count).getType();
-                }
-                if (count == winCondition) return true;
-            }
-        }
-        for (int row = 0; row <= rows - winCondition; ++row) {
-            int count = 0;
-            int prevElement = -1;
-            for (int col = cols - 1; col >= winCondition - 1; col--) {
-                if (this.isEmptyAt(row + count, col - count)) break;
-                if (this.getElement(row + count, col - count).getType() == prevElement) {
-                    count++;
-                } else {
-                    count = 1;
-                    prevElement = this.getElement(row + count, col - count).getType();
-                }
-                if (count == winCondition) return true;
-            }
-        }
-        return false;
+    
+    /**
+     * Sets the valid columns where a disc can be placed.
+     */
+    public void setValidColumns() {
+        // TODO: Mettre à jour les colonnes valides
+        // 1. Réinitialiser les cellules atteignables
+        // 2. Marquer les colonnes non pleines comme atteignables
     }
-
-
-
 }

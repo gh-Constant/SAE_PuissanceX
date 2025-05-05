@@ -25,7 +25,7 @@ public class PuissanceXConsole {
                 BOARD_COLS = Integer.parseInt(args[1]);
                 WIN_CONDITION = Integer.parseInt(args[2]);
                 GAME_MODE = Integer.parseInt(args[3]);
-                
+
                 // Validate parameters
                 if (BOARD_ROWS < 4 || BOARD_COLS < 4) {
                     Logger.info("Board dimensions must be at least 4x4");

@@ -1,5 +1,6 @@
 package model;
 
+import boardifier.control.Logger;
 import boardifier.model.GameStageModel;
 import boardifier.model.Model;
 import boardifier.model.StageElementsFactory;
@@ -19,7 +20,11 @@ public class PuissanceXLevel extends GameStageModel {
     
     public PuissanceXLevel(String name, Model model) {
         super(name, model);
-        
+
+
+
+
+
         // TODO: Initialisation
         // 1. Récupérer les paramètres du jeu (rows, cols, winCondition)
         // 2. Initialiser les tableaux pour les pots et les jetons
