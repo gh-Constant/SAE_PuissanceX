@@ -77,7 +77,7 @@ public class PuissanceXConsole {
 
         // Register model and view classes for the game stage
         // This allows the framework to create instances dynamically
-        StageFactory.registerModelAndView("puissanceXStage", "model.PuissanceXStageModel", "view.PuissanceXStageView");
+        StageFactory.registerModelAndView("puissanceXStage", "model.PuissanceXLevel", "view.console.PuissanceXLevelView");
 
         // Create the view that will display the game
         View view = new View(model);
