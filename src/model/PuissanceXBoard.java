@@ -129,40 +129,40 @@ public class PuissanceXBoard extends ContainerElement {
         int count = 0;
         int prevElement = -1;
         int r = row;
-        int c = col;
+        int i = col;
 
-        while (r >= 0 && c >= 0) {
-            if (this.isEmptyAt(r, c)) {
+        while (r >= 0 && i >= 0) {
+            if (this.isEmptyAt(r, i)) {
                 break;
             }
-            if (this.getElement(r, c).getType() == prevElement) {
+            if (this.getElement(r, i).getType() == prevElement) {
                 count++;
             } else {
                 count = 1;
-                prevElement = this.getElement(r, c).getType();
+                prevElement = this.getElement(r, i).getType();
             }
-            if (count == winCondition && this.getElement(r, c).getType() == playerId) {
+            if (count == winCondition && this.getElement(r, i).getType() == playerId) {
                 return true;
             }
             r--;
-            c--;
+            i--;
         }
 
         r = row + 1;
-        c = col + 1;
-        while (r < rows && c < cols) {
-            if (this.isEmptyAt(r, c)) break;
-            if (this.getElement(r, c).getType() == prevElement) {
+        i = col + 1;
+        while (r < rows && i < cols) {
+            if (this.isEmptyAt(r, i)) break;
+            if (this.getElement(r, i).getType() == prevElement) {
                 count++;
             } else {
                 count = 1;
-                prevElement = this.getElement(r, c).getType();
+                prevElement = this.getElement(r, i).getType();
             }
-            if (count == winCondition && this.getElement(r, c).getType() == playerId) {
+            if (count == winCondition && this.getElement(r, i).getType() == playerId) {
                 return true;
             }
             r++;
-            c++;
+            i++;
         }
 
         return false;
@@ -180,37 +180,37 @@ public class PuissanceXBoard extends ContainerElement {
         int prevElement = -1;
 
         int r = row;
-        int c = col;
-        while (r >= 0 && c < cols) {
-            if (this.isEmptyAt(r, c)) break;
-            if (this.getElement(r, c).getType() == prevElement) {
+        int i = col;
+        while (r >= 0 && i < cols) {
+            if (this.isEmptyAt(r, i)) break;
+            if (this.getElement(r, i).getType() == prevElement) {
                 count++;
             } else {
                 count = 1;
-                prevElement = this.getElement(r, c).getType();
+                prevElement = this.getElement(r, i).getType();
             }
-            if (count == winCondition && this.getElement(r, c).getType() == playerId) {
+            if (count == winCondition && this.getElement(r, i).getType() == playerId) {
                 return true;
             }
             r--;
-            c++;
+            i++;
         }
 
         r = row + 1;
-        c = col - 1;
-        while (r < rows && c >= 0) {
-            if (this.isEmptyAt(r, c)) break;
-            if (this.getElement(r, c).getType() == prevElement) {
+        i = col - 1;
+        while (r < rows && i >= 0) {
+            if (this.isEmptyAt(r, i)) break;
+            if (this.getElement(r, i).getType() == prevElement) {
                 count++;
             } else {
                 count = 1;
-                prevElement = this.getElement(r, c).getType();
+                prevElement = this.getElement(r, i).getType();
             }
-            if (count == winCondition && this.getElement(r, c).getType() == playerId) {
+            if (count == winCondition && this.getElement(r, i).getType() == playerId) {
                 return true;
             }
             r++;
-            c--;
+            i--;
         }
 
         return false;
@@ -235,18 +235,9 @@ public class PuissanceXBoard extends ContainerElement {
      * @return true if the board is full, false otherwise
      */
     public boolean isFull() {
-        // TODO: Vérifier si la grille est pleine
-        // 1. Parcourir toutes les colonnes
-        // 2. Vérifier si au moins une colonne n'est pas pleine
-        return false;
-    }
-    
-    /**
-     * Sets the valid columns where a disc can be placed.
-     */
-    public void setValidColumns() {
-        // TODO: Mettre à jour les colonnes valides
-        // 1. Réinitialiser les cellules atteignables
-        // 2. Marquer les colonnes non pleines comme atteignables
+        for (int col = 0; col < this.cols; col++) {
+            if (this.isEmptyAt(0, col)) return false;
+        }
+        return true;
     }
 }
