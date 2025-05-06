@@ -249,4 +249,57 @@ public class PuissanceXBoard extends ContainerElement {
         // 1. Réinitialiser les cellules atteignables
         // 2. Marquer les colonnes non pleines comme atteignables
     }
+
+    /**
+     * Checks if a column is playable (can accept a disc).
+     * @param col The column to check
+     * @return true if a disc can be placed in this column, false otherwise
+     */
+    public boolean isColumnPlayable(int col) {
+        // A column is playable if it's within bounds and the top cell is empty
+        if (col < 0 || col >= cols) return false;
+        return isEmptyAt(0, col);
+    }
+
+    /**
+     * Checks if a cell is empty.
+     * @param row The row of the cell
+     * @param col The column of the cell
+     * @return true if the cell is empty, false otherwise
+     */
+    public boolean isCellEmpty(int row, int col) {
+        // Check if the cell is within bounds
+        if (row < 0 || row >= rows || col < 0 || col >= cols) return false;
+        // A cell is empty if there's no element at that position
+        return isEmptyAt(row, col);
+    }
+
+    /**
+     * Checks if a cell is reachable (can be interacted with).
+     * @param row The row of the cell
+     * @param col The column of the cell
+     * @return true if the cell is reachable, false otherwise
+     */
+    public boolean isCellReachable(int row, int col) {
+        // Check if the cell is within bounds
+        if (row < 0 || row >= rows || col < 0 || col >= cols) return false;
+        // A cell is reachable if it's marked as reachable in the reachableCells array
+        return canReachCell(row, col);
+    }
+
+    /**
+     * Gets the number of columns in the board.
+     * @return The number of columns
+     */
+    public int getNbCols() {
+        return cols;
+    }
+
+    /**
+     * Gets the number of rows in the board.
+     * @return The number of rows
+     */
+    public int getNbRows() {
+        return rows;
+    }
 }

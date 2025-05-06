@@ -13,17 +13,36 @@ public class DiscLook extends ElementLook {
     
     @Override
     protected void render() {
-        // TODO: Rendre le jeton avec le bon caractère et la bonne couleur
-        // Utiliser ConsoleColor pour les couleurs
-        // Exemple: shape[0][0] = ConsoleColor.RED + "O" + ConsoleColor.RESET;
+        Disc disc = (Disc)element;
+        String discColor = disc.getColor();
+        
+        if (discColor.equals(Disc.COLOR_PLAYER1)) {
+            shape[0][0] = ConsoleColor.YELLOW + "O" + ConsoleColor.RESET;
+        } 
+        else if (discColor.equals(Disc.COLOR_PLAYER2)) {
+            shape[0][0] = ConsoleColor.RED + "O" + ConsoleColor.RESET;
+        }
     }
     
     @Override
     public void onSelectionChange() {
-        // TODO: Changer l'apparence quand le jeton est sélectionné
+        Disc disc = (Disc)element;
+        String discColor = disc.getColor();
+        
+        if (element.isSelected()) {
+            if (discColor.equals(Disc.COLOR_PLAYER1)) {
+                shape[0][0] = ConsoleColor.YELLOW_BACKGROUND + "O" + ConsoleColor.RESET;
+            } 
+            else if (discColor.equals(Disc.COLOR_PLAYER2)) {
+                shape[0][0] = ConsoleColor.RED_BACKGROUND + "O" + ConsoleColor.RESET;
+            }
+        } 
+        else {
+            render(); // Reset to normal appearance
+        }
     }
 
     public void onPutInContainer() {
-        // TODO: Ajuster l'apparence quand le jeton est placé dans un conteneur
+        render(); // Update appearance when placed in container
     }
 }
