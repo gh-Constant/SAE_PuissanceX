@@ -46,8 +46,7 @@ public class PuissanceXPotLook extends GridLook {
         shape[height-1][0] = borderColor + "└" + ConsoleColor.RESET;
         shape[height-1][width-1] = borderColor + "┘" + ConsoleColor.RESET;
     }
-    
-    @Override
+
     public void onReachableChange() {
         // Mettre en évidence le pot lorsqu'il est atteignable
         PuissanceXPot pot = (PuissanceXPot)element;
