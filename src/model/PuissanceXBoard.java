@@ -105,12 +105,14 @@ public class PuissanceXBoard extends ContainerElement {
             if (this.isEmptyAt(i, col)) {
                 break;
             }
+
             if (this.getElement(i, col).getType() == prevElement) {
                 count++;
             } else {
                 count = 1;
                 prevElement = this.getElement(i, col).getType();
             }
+
             if (count == winCondition && this.getElement(i, col).getType() == playerId) {
                 return true;
             }
@@ -135,12 +137,14 @@ public class PuissanceXBoard extends ContainerElement {
             if (this.isEmptyAt(r, i)) {
                 break;
             }
+
             if (this.getElement(r, i).getType() == prevElement) {
                 count++;
             } else {
                 count = 1;
                 prevElement = this.getElement(r, i).getType();
             }
+
             if (count == winCondition && this.getElement(r, i).getType() == playerId) {
                 return true;
             }
@@ -151,13 +155,17 @@ public class PuissanceXBoard extends ContainerElement {
         r = row + 1;
         i = col + 1;
         while (r < rows && i < cols) {
-            if (this.isEmptyAt(r, i)) break;
+            if (this.isEmptyAt(r, i)) {
+                break;
+            }
+
             if (this.getElement(r, i).getType() == prevElement) {
                 count++;
             } else {
                 count = 1;
                 prevElement = this.getElement(r, i).getType();
             }
+
             if (count == winCondition && this.getElement(r, i).getType() == playerId) {
                 return true;
             }
@@ -182,13 +190,17 @@ public class PuissanceXBoard extends ContainerElement {
         int r = row;
         int i = col;
         while (r >= 0 && i < cols) {
-            if (this.isEmptyAt(r, i)) break;
+            if (this.isEmptyAt(r, i)) {
+                break;
+            }
+
             if (this.getElement(r, i).getType() == prevElement) {
                 count++;
             } else {
                 count = 1;
                 prevElement = this.getElement(r, i).getType();
             }
+
             if (count == winCondition && this.getElement(r, i).getType() == playerId) {
                 return true;
             }
@@ -199,13 +211,17 @@ public class PuissanceXBoard extends ContainerElement {
         r = row + 1;
         i = col - 1;
         while (r < rows && i >= 0) {
-            if (this.isEmptyAt(r, i)) break;
+            if (this.isEmptyAt(r, i)) {
+                break;
+            }
+
             if (this.getElement(r, i).getType() == prevElement) {
                 count++;
             } else {
                 count = 1;
                 prevElement = this.getElement(r, i).getType();
             }
+            
             if (count == winCondition && this.getElement(r, i).getType() == playerId) {
                 return true;
             }

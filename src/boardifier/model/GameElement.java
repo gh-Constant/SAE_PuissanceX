@@ -100,7 +100,7 @@ public abstract class GameElement {
      * type set to basic.
      *
      * @param x              The x location in space
-                                                                                                                                                                                                                                                                                 àà  * @param y              The y location in space
+     * @param y              The y location in space
      * @param gameStageModel The game stage that owns this element.
      */
     public GameElement(double x,  double y, GameStageModel gameStageModel) {
