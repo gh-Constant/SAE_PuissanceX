@@ -229,25 +229,44 @@ public class PuissanceXBoard extends ContainerElement {
                 || this.checkDiagonal1(row, col, playerId) 
                 || this.checkDiagonal2(row, col, playerId);
     }
-    
+
     /**
      * Checks if the board is full (draw).
      * @return true if the board is full, false otherwise
      */
     public boolean isFull() {
-        // TODO: Vérifier si la grille est pleine
-        // 1. Parcourir toutes les colonnes
-        // 2. Vérifier si au moins une colonne n'est pas pleine
-        return false;
+        // Check if any column is not full
+        for (int col = 0; col < cols; col++) {
+            if (isEmptyAt(0, col)) {
+                return false;
+            }
+        }
+        return true;
     }
-    
+
     /**
      * Sets the valid columns where a disc can be placed.
      */
     public void setValidColumns() {
-        // TODO: Mettre à jour les colonnes valides
-        // 1. Réinitialiser les cellules atteignables
-        // 2. Marquer les colonnes non pleines comme atteignables
+        // Reset reachable cells
+        for (int row = 0; row < rows; row++) {
+            for (int col = 0;  col < cols; col++) {
+                setReachable(row, col, false);
+            }
+        }
+        
+        // Mark non-full columns as reachable at their top position
+        for (int col = 0; col < cols; col++) {
+            if (isColumnPlayable(col)) {
+                // Find the first empty cell in this column
+                for (int row = rows - 1; row >= 0; row--) {
+                    if (isEmptyAt(row, col)) {
+                        setReachable(row, col, true);
+                        break;
+                    }
+                }
+            }
+        }
     }
 
     /**
@@ -301,5 +320,17 @@ public class PuissanceXBoard extends ContainerElement {
      */
     public int getNbRows() {
         return rows;
+    }
+
+    /**
+     * Sets whether a cell is reachable or not.
+     * @param row The row of the cell
+     * @param col The column of the cell
+     * @param reachable Whether the cell should be reachable
+     */
+    private void setReachable(int row, int col, boolean reachable) {
+        if (row >= 0 && row < rows && col >= 0 && col < cols) {
+            reachableCells[row][col] = reachable;
+        }
     }
 }
