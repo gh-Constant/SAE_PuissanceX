@@ -2,6 +2,7 @@ package model;
 
 import boardifier.model.GameStageModel;
 import boardifier.model.ContainerElement;
+import boardifier.model.GameElement;
 
 public class PuissanceXPot extends ContainerElement {
     
@@ -65,4 +66,19 @@ public class PuissanceXPot extends ContainerElement {
     public boolean isDiscAvailable() {
         return !this.isEmpty();
     }
+
+    /**
+     * Gets the first available disc from the pot
+     * @return The first available disc, or null if none is available
+     */
+    public Disc getFirstAvailableDisc() {
+        // Use getElements() method from ContainerElement instead of elements directly
+        for (GameElement element : getElements(0, 0)) {
+            if (element instanceof Disc) {
+                return (Disc) element;
+            }
+        }
+        return null;
+    }
 }
+
