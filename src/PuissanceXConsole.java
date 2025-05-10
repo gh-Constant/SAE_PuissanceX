@@ -1,111 +1,99 @@
+import boardifier.control.Logger;
+import boardifier.control.StageFactory;
 import boardifier.model.GameException;
 import boardifier.view.View;
 import control.PuissanceXController;
-import boardifier.control.StageFactory;
-import boardifier.model.Model;
-import boardifier.control.Controller;
-import boardifier.control.Logger;
-import java.util.Arrays;
+import model.PuissanceXModel;
 
 public class PuissanceXConsole {
-    // Game parameters
-    private static int BOARD_ROWS = 6;    // default value
-    private static int BOARD_COLS = 7;    // default value
-    private static int WIN_CONDITION = 4; // default value
-    private static int GAME_MODE = 0;     // 0: Human vs Human, 1: Human vs AI, 2: AI vs AI
+    public static void main(String[] args) {
+        // Initialize boardifier logger settings
+        Logger.setLevel(Logger.LOGGER_TRACE); 
+        Logger.setVerbosity(Logger.VERBOSE_HIGH);
 
-    public static void main(String[] args) throws GameException {
-        // Set logger level to INFO
-        Logger.setLevel(Logger.LOGGER_INFO);
-        
-        // Parse command line arguments
-        if (args.length >= 4) {
-            try {
-                BOARD_ROWS = Integer.parseInt(args[0]);
-                BOARD_COLS = Integer.parseInt(args[1]);
-                WIN_CONDITION = Integer.parseInt(args[2]);
-                GAME_MODE = Integer.parseInt(args[3]);
+        System.out.println("INFO: Starting PuissanceX Console...");
 
-                // Validate parameters
-                if (BOARD_ROWS < 4 || BOARD_COLS < 4) {
-                    Logger.info("Board dimensions must be at least 4x4");
-                    return;
-                }
-                if (WIN_CONDITION < 3 || WIN_CONDITION > Math.max(BOARD_ROWS, BOARD_COLS)) {
-                    Logger.info("Invalid win condition value");
-                    return;
-                }
-                if (GAME_MODE < 0 || GAME_MODE > 2) {
-                    Logger.info("Invalid game mode. Using default mode (Human vs Human)");
-                    GAME_MODE = 0;
-                }
-                
-                Logger.info("Game parameters: " + BOARD_ROWS + "x" + BOARD_COLS + 
-                          ", Win condition: " + WIN_CONDITION + 
-                          ", Mode: " + GAME_MODE);
-            }
-            catch(NumberFormatException e) {
-                Logger.info("Invalid arguments. Using default values.");
-                BOARD_ROWS = 6;
-                BOARD_COLS = 7;
-                WIN_CONDITION = 4;
-                GAME_MODE = 0;
-            }
-        }
-        else {
-            Logger.info("Using default values: " + BOARD_ROWS + "x" + BOARD_COLS + 
-                      ", Win condition: " + WIN_CONDITION + 
-                      ", Mode: " + GAME_MODE);
-        }
+        // Default values
+        int winCondition = 4;
+        int boardRows = 6;
+        int boardCols = 7;
+        int currentGameMode = 0;
 
-        // Create the model that will manage game state
-        Model model = new Model();
-        
-        // Add players based on game mode
-        switch (GAME_MODE) {
-            case 0: // Human vs Human
-                model.addHumanPlayer("Joueur 1");
-                model.addHumanPlayer("Joueur 2");
-                break;
-            case 1: // Human vs AI
-                model.addHumanPlayer("Joueur 1");
-                model.addComputerPlayer("Ordinateur");
-                break;
-            case 2: // AI vs AI
-                model.addComputerPlayer("Ordinateur 1");
-                model.addComputerPlayer("Ordinateur 2");
-                break;
-        }
-
-        // Register model and view classes for the game stage
-        // This allows the framework to create instances dynamically
-        StageFactory.registerModelAndView("puissanceXStage", "model.PuissanceXLevel", "view.console.PuissanceXLevelView");
-
-        // Create the view that will display the game
-        View view = new View(model);
-        
-        // Create the controller that will manage game logic
-        control.PuissanceXController controller = new control.PuissanceXController(model, view, BOARD_ROWS, BOARD_COLS, WIN_CONDITION);
-
-        // Set the first stage to be used when starting the game
-        controller.setFirstStageName("puissanceXStage");
-
-        // Start the game (creates the first stage)
         try {
-            controller.startGame();
-        } catch (GameException e) {
-            Logger.info("Failed to start game: " + e.getMessage());
-            Logger.debug("Stack trace: " + Arrays.toString(e.getStackTrace()));
-            return;
+            if (args.length >= 1) {
+                winCondition = Integer.parseInt(args[0]);
+                System.out.println("DEBUG: Parsed Win Condition argument: " + winCondition);
+            }
+            if (args.length >= 2) {
+                boardRows = Integer.parseInt(args[1]);
+                System.out.println("DEBUG: Parsed rows argument: " + boardRows);
+            }
+            if (args.length >= 3) {
+                boardCols = Integer.parseInt(args[2]);
+                System.out.println("DEBUG: Parsed columns argument: " + boardCols);
+            }
+            if (args.length >= 4) {
+                currentGameMode = Integer.parseInt(args[3]);
+                System.out.println("DEBUG: Parsed mode argument: " + currentGameMode);
+            }
+        } catch (NumberFormatException e) {
+            System.err.println("WARNING: Error parsing arguments: " + e.getMessage() + ". Review arguments. Some or all parameters will use defaults.");
         }
 
-        // Start the main game loop
-        controller.stageLoop();
-    }
+        // Game Mode validation
+        if (currentGameMode < 0 || currentGameMode > 2) {
+            System.err.println("WARNING: Parsed game mode (" + currentGameMode + ") is invalid. Setting to 0 (Human vs Human).");
+            currentGameMode = 0;
+        }
 
-    // Getter methods for game parameters
-    public static int getBoardRows() { return BOARD_ROWS; }
-    public static int getBoardCols() { return BOARD_COLS; }
-    public static int getWinCondition() { return WIN_CONDITION; }
-    public static int getGameMode() { return GAME_MODE; }
-}
+        System.out.println("INFO: Final effective game parameters set:");
+        System.out.println("  Win Condition: " + winCondition);
+        System.out.println("  Board rows: " + boardRows);
+        System.out.println("  Board columns: " + boardCols);
+        System.out.println("  Game mode: " + currentGameMode);
+
+        // Initialize model with parameters
+        PuissanceXModel model = new PuissanceXModel();
+        model.setWinCondition(winCondition);
+        model.setBoardRows(boardRows);
+        model.setBoardCols(boardCols);
+
+        System.out.println("INFO: Setting up players for mode: " + currentGameMode);
+        if (currentGameMode == 0) {
+            model.addHumanPlayer("player1");
+            model.addHumanPlayer("player2");
+            System.out.println("DEBUG: Added player1 (Human) and player2 (Human).");
+        } else if (currentGameMode == 1) {
+            model.addHumanPlayer("player");
+            model.addComputerPlayer("computer");
+            System.out.println("DEBUG: Added player (Human) and computer (AI).");
+        } else if (currentGameMode == 2) {
+            model.addComputerPlayer("computer1");
+            model.addComputerPlayer("computer2");
+            System.out.println("DEBUG: Added computer1 (AI) and computer2 (AI).");
+        }
+
+        System.out.println("INFO: Registering PuissanceX model and view with StageFactory.");
+        StageFactory.registerModelAndView("puissanceX", "model.PuissanceXStageModel", "view.PuissanceXStageView");
+        
+        View gameView = new View(model); 
+        System.out.println("DEBUG: View object (boardifier.view.View) created.");
+
+        PuissanceXController control = new PuissanceXController(model, gameView);
+        System.out.println("DEBUG: PuissanceXController object created.");
+        
+        control.setFirstStageName("puissanceX");
+        System.out.println("DEBUG: First stage name set to 'puissanceX'.");
+
+        try {
+            System.out.println("INFO: Attempting to start game...");
+            control.startGame();
+            System.out.println("INFO: Game started successfully. Entering stage loop.");
+            control.stageLoop();
+            System.out.println("INFO: Stage loop exited. Game ended.");
+        } catch (Exception e) {
+            System.err.println("ERROR: An unexpected error occurred: " + e.getMessage() + ". Aborting.");
+            System.err.println("ERROR_DETAILS: " + e.toString());
+        }
+    }
+} 

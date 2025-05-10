@@ -103,7 +103,7 @@ public abstract class GameElement {
      * @param y              The y location in space
      * @param gameStageModel The game stage that owns this element.
      */
-    public GameElement(double x,  double y, GameStageModel gameStageModel) {
+    public GameElement(double x, double y, GameStageModel gameStageModel) {
         this(x, y, gameStageModel, ElementTypes.getType("basic"));
     }
 
