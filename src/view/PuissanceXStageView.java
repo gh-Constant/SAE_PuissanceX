@@ -1,6 +1,5 @@
 package view;
 
-import boardifier.model.GameElement;
 import boardifier.model.GameStageModel;
 import boardifier.view.GameStageView;
 import boardifier.view.TextLook;
@@ -19,6 +18,18 @@ public class PuissanceXStageView extends GameStageView {
      */
     public PuissanceXStageView(String name, GameStageModel gameStageModel) {
         super(name, gameStageModel);
+
+        // Ajoute le callback pour chaque ajout de disque dans le board
+        gameStageModel.onPutInContainer((element, container, row, col) -> {
+            if (element instanceof Disk && container instanceof Board) {
+                // Cherche le BoardLook déjà créé
+                BoardLook boardLook = (BoardLook) getElementLook(container);
+                if (boardLook != null) {
+                    DiskLook diskLook = new DiskLook((Disk) element);
+                    boardLook.addInnerLook(diskLook, row, col);
+                }
+            }
+        });
     }
 
     /**
@@ -35,17 +46,5 @@ public class PuissanceXStageView extends GameStageView {
         // Create look for the player text
         TextLook textLook = new TextLook(model.getPlayerText());
         addLook(textLook);
-        
-        // Create looks for any disks that might already be on the board
-        for (int row = 0; row < model.getBoard().getNbRows(); row++) {
-            for (int col = 0; col < model.getBoard().getNbCols(); col++) {
-                for (GameElement element : model.getBoard().getElements(row, col)) {
-                    if (element instanceof Disk) {
-                        DiskLook diskLook = new DiskLook((Disk) element);
-                        addLook(diskLook);
-                    }
-                }
-            }
-        }
     }
 }

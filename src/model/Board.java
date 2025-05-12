@@ -1,8 +1,9 @@
 package model;
 
 import boardifier.model.ContainerElement;
-import boardifier.model.GameStageModel;
 import boardifier.model.ElementTypes;
+import boardifier.model.GameElement;
+import boardifier.model.GameStageModel;
 
 public class Board extends ContainerElement {
     
@@ -13,6 +14,11 @@ public class Board extends ContainerElement {
     public Board(int rows, int cols, GameStageModel gameStageModel) {
         super("board", 0, 0, rows, cols, gameStageModel);
         this.type = ElementTypes.getType("board");
+    }
+
+    @Override
+    public void addElement(GameElement element, int row, int col) {
+        super.addElement(element, row, col);
     }
     
     // Method to check if a column is full
