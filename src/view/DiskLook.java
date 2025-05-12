@@ -1,13 +1,16 @@
 package view;
 
-import boardifier.view.ElementLook;
 import boardifier.view.ConsoleColor;
+import boardifier.view.ElementLook;
 import model.Disk;
 
 public class DiskLook extends ElementLook {
     
     public DiskLook(Disk disk) {
-        super(disk, 1, 1); // A disk occupies 1x1 character
+        // A disk now occupies 3x5 characters to match the board cell size
+        super(disk, 3, 5);
+        // Set anchor to top-left to match the grid cell positioning
+        setAnchorType(ANCHOR_TOPLEFT);
         render();
     }
     
@@ -15,14 +18,26 @@ public class DiskLook extends ElementLook {
     public void render() {
         Disk disk = (Disk) element;
         
-        // Player 1 is typically red, Player 2 is typically yellow
-        String diskSymbol;
+        // Define colors and styles for each player
+        String color;
+        String symbol;
         if (disk.getPlayerId() == 0) {
-            diskSymbol = ConsoleColor.RED_BACKGROUND + " " + ConsoleColor.RESET;
+            color = ConsoleColor.RED_BACKGROUND;
+            symbol = ConsoleColor.RED_BOLD + "O" + ConsoleColor.RESET;
         } else {
-            diskSymbol = ConsoleColor.YELLOW_BACKGROUND + " " + ConsoleColor.RESET;
+            color = ConsoleColor.YELLOW_BACKGROUND;
+            symbol = ConsoleColor.YELLOW_BOLD + "O" + ConsoleColor.RESET;
         }
         
-        shape[0][0] = diskSymbol;
+        // Fill the 3x5 space with the colored background and symbol
+        for(int i = 0; i < 3; i++) {
+            for(int j = 0; j < 5; j++) {
+                if (i == 1 && j == 2) {
+                    shape[i][j] = symbol; // Center symbol
+                } else {
+                    shape[i][j] = color + " " + ConsoleColor.RESET; // Background color
+                }
+            }
+        }
     }
 }

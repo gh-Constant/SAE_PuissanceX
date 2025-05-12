@@ -1,18 +1,26 @@
 package view;
 
-import boardifier.view.GridLook;
+import boardifier.view.ClassicBoardLook;
 import model.Board;
 
-public class BoardLook extends GridLook {
+public class BoardLook extends ClassicBoardLook {
     
     public BoardLook(Board board) {
-        // Create a grid look with cells of size 1x1, with depth 0, and border width 1
-        super(1, 1, board, 0, 1);
+        // Create a classic board look with:
+        // - cells of size 3x5 (height x width)
+        // - depth 0
+        // - border width 1
+        // - show coordinates true
+        super(3, 5, board, 0, 1, true);
+        
+        // Set cell alignments to center for better visual appearance
+        setVerticalAlignment(ALIGN_MIDDLE);
+        setHorizontalAlignment(ALIGN_CENTER);
     }
 
     @Override
     protected void renderBorders() {
-        // Use the default border rendering from GridLook
+        // Use the default border rendering from ClassicBoardLook
         super.renderBorders();
     }
 }
