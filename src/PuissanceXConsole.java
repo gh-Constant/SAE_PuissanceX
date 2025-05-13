@@ -2,7 +2,7 @@ import boardifier.control.Logger;
 import boardifier.control.StageFactory;
 import boardifier.view.View;
 import control.PuissanceXController;
-import control.ai.RandomAIDecider;
+import control.ai.MinimaxAI;
 import model.PuissanceXModel;
 
 public class PuissanceXConsole {
@@ -84,9 +84,9 @@ public class PuissanceXConsole {
         
         // Set up AI decider if needed
         if (currentGameMode == 1 || currentGameMode == 2) {
-            RandomAIDecider aiDecider = new RandomAIDecider(model, control);
+            MinimaxAI aiDecider = new MinimaxAI(model, control);
             control.setAIDecider(aiDecider);
-            Logger.debug("RandomAIDecider created and set for AI players.");
+            Logger.debug("MinimaxAI created and set for AI players.");
         }
         
         control.setFirstStageName("puissanceX");
