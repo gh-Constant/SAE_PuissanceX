@@ -2,6 +2,7 @@ import boardifier.control.Logger;
 import boardifier.control.StageFactory;
 import boardifier.view.View;
 import control.PuissanceXController;
+import control.ai.RandomAIDecider;
 import model.PuissanceXModel;
 
 public class PuissanceXConsole {
@@ -16,7 +17,7 @@ public class PuissanceXConsole {
         int winCondition = 4;
         int boardRows = 6;
         int boardCols = 7;
-        int currentGameMode = 0;
+        int currentGameMode = 1;
 
         try {
             if (args.length >= 1) {
@@ -80,6 +81,13 @@ public class PuissanceXConsole {
 
         PuissanceXController control = new PuissanceXController(model, gameView);
         Logger.debug("PuissanceXController object created.");
+        
+        // Set up AI decider if needed
+        if (currentGameMode == 1 || currentGameMode == 2) {
+            RandomAIDecider aiDecider = new RandomAIDecider(model, control);
+            control.setAIDecider(aiDecider);
+            Logger.debug("RandomAIDecider created and set for AI players.");
+        }
         
         control.setFirstStageName("puissanceX");
         Logger.debug("First stage name set to 'puissanceX'.");

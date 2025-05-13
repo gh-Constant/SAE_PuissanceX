@@ -1,10 +1,15 @@
 package control;
 
 import boardifier.control.ActionFactory;
+import boardifier.control.ActionPlayer;
 import boardifier.control.Controller;
+import boardifier.control.Decider;
 import boardifier.model.GameException;
 import boardifier.model.Model;
+import boardifier.model.Player;
+import boardifier.model.action.ActionList;
 import boardifier.view.View;
+import control.ai.RandomAIDecider;
 import model.Board;
 import model.Disk;
 import model.PuissanceXStageModel;
@@ -18,6 +23,7 @@ import java.util.Scanner;
 public class PuissanceXController extends Controller {
 
     private Scanner scanner;
+    private Decider aiDecider;
 
     /**
      * Constructor for the PuissanceX controller.
@@ -25,6 +31,11 @@ public class PuissanceXController extends Controller {
     public PuissanceXController(Model model, View view) {
         super(model, view);
         this.scanner = new Scanner(System.in);
+        this.aiDecider = null;
+    }
+    
+    public void setAIDecider(Decider decider) {
+        this.aiDecider = decider;
     }
 
     /**
@@ -60,27 +71,59 @@ public class PuissanceXController extends Controller {
         // Game over
         displayGameResult();
     }
-    
-    private void playTurn() {
+
+    public void playTurn() {
         PuissanceXStageModel stageModel = (PuissanceXStageModel) model.getGameStage();
         Board board = stageModel.getBoard();
         int currentPlayer = model.getIdPlayer();
+        Player player = model.getPlayers().get(currentPlayer);
         
         System.out.println("Player " + (currentPlayer + 1) + " (" + model.getCurrentPlayerName() + "), your turn.");
-        System.out.println("Enter column number (0-" + (board.getNbCols() - 1) + "): ");
         
+        // Check if current player is AI
+        if (player.getType() == Player.COMPUTER) {
+            System.out.println("AI is thinking...");
+            
+            // Use the AI decider to make a move
+            if (aiDecider != null) {
+                ActionList actions = aiDecider.decide();
+                if (actions != null) {
+                    // Play the action
+                    ActionPlayer actionPlayer = new ActionPlayer(model, this, actions);
+                    actionPlayer.start();
+                    
+                    // Check for win after AI move
+                    checkGameEndConditions(board);
+                } else {
+                    System.out.println("AI couldn't make a valid move!");
+                }
+            } else {
+                System.out.println("Error: AI decider not set!");
+            }
+        } else {
+            // Human player's turn - existing code for human input
+            handleHumanPlayerTurn(board, currentPlayer);
+        }
+    }
+    
+    private void handleHumanPlayerTurn(Board board, int currentPlayer) {
         boolean validMove = false;
+        
         while (!validMove) {
+            System.out.println("Enter column number (0-" + (board.getNbCols() - 1) + "): ");
             try {
-                int col = Integer.parseInt(scanner.nextLine());
+                String input = scanner.nextLine();
+                int col = Integer.parseInt(input);
                 
+                // Check if the column is valid
                 if (col < 0 || col >= board.getNbCols()) {
-                    System.out.println("Invalid column. Try again.");
+                    System.out.println("Invalid column number. Try again.");
                     continue;
                 }
                 
+                // Check if the column is full
                 if (board.isColumnFull(col)) {
-                    System.out.println("Column is full. Try again.");
+                    System.out.println("Column is full. Try another one.");
                     continue;
                 }
                 
@@ -88,25 +131,18 @@ public class PuissanceXController extends Controller {
                 int row = board.getFirstEmptyRow(col);
                 
                 // Create a new disk
-                Disk disk = new Disk(currentPlayer, stageModel);
+                Disk disk = new Disk(currentPlayer, (PuissanceXStageModel)model.getGameStage());
                 
                 // Create an action to place the disk
-                boardifier.model.action.ActionList actions = ActionFactory.generatePutInContainer(model, disk, "board", row, col);
+                ActionList actions = ActionFactory.generatePutInContainer(model, disk, "board", row, col);
                 actions.setDoEndOfTurn(true);
                 
                 // Play the action
-                boardifier.control.ActionPlayer actionPlayer = new boardifier.control.ActionPlayer(model, this, actions);
+                ActionPlayer actionPlayer = new ActionPlayer(model, this, actions);
                 actionPlayer.start();
                 
-                // Check for win
-                if (stageModel.checkWin(row, col, currentPlayer)) {
-                    model.setIdWinner(currentPlayer);
-                    model.stopStage();
-                }
-                // Check for draw
-                else if (stageModel.isBoardFull()) {
-                    model.stopStage();
-                }
+                // Check for win or draw
+                checkGameEndConditions(board);
                 
                 validMove = true;
                 
@@ -115,6 +151,28 @@ public class PuissanceXController extends Controller {
             } catch (Exception e) {
                 System.out.println("Error: " + e.getMessage());
             }
+        }
+    }
+    
+    private void checkGameEndConditions(Board board) {
+        PuissanceXStageModel stageModel = (PuissanceXStageModel) model.getGameStage();
+        int currentPlayer = model.getIdPlayer();
+        
+        // Check for win - this assumes the last move was at the last filled position
+        for (int col = 0; col < board.getNbCols(); col++) {
+            int row = board.getFirstEmptyRow(col);
+            if (row < board.getNbRows() - 1) {  // If there's a piece below the empty spot
+                if (stageModel.checkWin(row + 1, col, currentPlayer)) {
+                    model.setIdWinner(currentPlayer);
+                    model.stopStage();
+                    return;
+                }
+            }
+        }
+        
+        // Check for draw
+        if (stageModel.isBoardFull()) {
+            model.stopStage();
         }
     }
     
