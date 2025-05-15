@@ -2,6 +2,8 @@
 out/
 .idea/
 .class
+.class*.class
+*.jar
 
 /shelf/
 /workspace.xml
