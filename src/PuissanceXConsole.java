@@ -2,7 +2,7 @@ import boardifier.control.Logger;
 import boardifier.control.StageFactory;
 import boardifier.view.View;
 import control.PuissanceXController;
-import control.ai.MinimaxAI;
+import control.ai.RandomAIDecider;
 import model.PuissanceXModel;
 
 public class PuissanceXConsole {
@@ -67,7 +67,7 @@ public class PuissanceXConsole {
             model.addHumanPlayer("player");
             model.addComputerPlayer("computer");
             Logger.debug("Added player (Human) and computer (AI).");
-        } else if (currentGameMode == 2) {
+        } else {
             model.addComputerPlayer("computer1");
             model.addComputerPlayer("computer2");
             Logger.debug("Added computer1 (AI) and computer2 (AI).");
@@ -84,7 +84,7 @@ public class PuissanceXConsole {
         
         // Set up AI decider if needed
         if (currentGameMode == 1 || currentGameMode == 2) {
-            MinimaxAI aiDecider = new MinimaxAI(model, control);
+            RandomAIDecider aiDecider = new RandomAIDecider(model, control);
             control.setAIDecider(aiDecider);
             Logger.debug("MinimaxAI created and set for AI players.");
         }
@@ -100,7 +100,7 @@ public class PuissanceXConsole {
             Logger.info("Stage loop exited. Game ended.");
         } catch (Exception e) {
             Logger.info("An unexpected error occurred: " + e.getMessage() + ". Aborting.");
-            Logger.info("ERROR_DETAILS: " + e.toString());
+            Logger.info("ERROR_DETAILS: " + e);
         }
     }
 } 
