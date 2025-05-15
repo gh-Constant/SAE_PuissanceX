@@ -67,7 +67,9 @@ public class PuissanceXController extends Controller {
                 update();
             }
         }
-        
+
+        update();
+
         // Game over
         displayGameResult();
     }
