@@ -1,11 +1,11 @@
 package view;
 
 import boardifier.view.ClassicBoardLook;
-import model.Board;
+import model.PuissanceXBoard;
 
 public class BoardLook extends ClassicBoardLook {
     
-    public BoardLook(Board board) {
+    public BoardLook(PuissanceXBoard board) {
         // Create a classic board look with:
         // - cells of size 3x5 (height x width)
         // - depth 0

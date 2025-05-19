@@ -4,7 +4,7 @@ import boardifier.model.ContainerElement;
 import boardifier.model.ElementTypes;
 import boardifier.model.GameStageModel;
 
-public class Board extends ContainerElement {
+public class PuissanceXBoard extends ContainerElement {
 
     public static final String BOARD_NAME = "board";
 
@@ -12,7 +12,7 @@ public class Board extends ContainerElement {
         ElementTypes.register(BOARD_NAME, 51); // Register a unique type for the board
     }
     
-    public Board(int rows, int cols, GameStageModel gameStageModel) {
+    public PuissanceXBoard(int rows, int cols, GameStageModel gameStageModel) {
         super(BOARD_NAME, 0, 0, rows, cols, gameStageModel);
         this.type = ElementTypes.getType(BOARD_NAME);
     }

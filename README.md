@@ -200,7 +200,7 @@ The project follows the MVC (Model-View-Controller) architecture:
   - [ ] Create game information panel with JavaFX controls
 
 - [ ] **Add animations and effects**
-  - [ ] Implement disk dropping animation
+  - [ ] Implement puissanceXDisk dropping animation
   - [ ] Add highlighting for winning combinations
   - [ ] Create transition effects between turns
   - [ ] Add sound effects for moves and game events

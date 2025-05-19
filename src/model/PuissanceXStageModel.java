@@ -6,7 +6,7 @@ import boardifier.model.StageElementsFactory;
 import boardifier.model.TextElement;
 
 public class PuissanceXStageModel extends GameStageModel {
-    private Board board;
+    private PuissanceXBoard board;
     private TextElement playerText;
     private int winCondition;
     
@@ -29,11 +29,11 @@ public class PuissanceXStageModel extends GameStageModel {
         return winCondition;
     }
     
-    public Board getBoard() {
+    public PuissanceXBoard getBoard() {
         return board;
     }
     
-    public void setBoard(Board board) {
+    public void setBoard(PuissanceXBoard board) {
         this.board = board;
         addContainer(board);
     }
@@ -124,9 +124,9 @@ public class PuissanceXStageModel extends GameStageModel {
     
     private boolean isDiskOfPlayer(int row, int col, int playerId) {
         if (board.getElements(row, col).isEmpty()) return false;
-        if (board.getElements(row, col).get(0) instanceof Disk) {
-            Disk disk = (Disk) board.getElements(row, col).get(0);
-            return disk.getPlayerId() == playerId;
+        if (board.getElements(row, col).get(0) instanceof PuissanceXDisk) {
+            PuissanceXDisk puissanceXDisk = (PuissanceXDisk) board.getElements(row, col).get(0);
+            return puissanceXDisk.getPlayerId() == playerId;
         }
         return false;
     }
