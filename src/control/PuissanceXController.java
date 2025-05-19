@@ -10,8 +10,8 @@ import boardifier.model.Player;
 import boardifier.model.action.ActionList;
 import boardifier.view.View;
 import control.ai.RandomAIDecider;
-import model.Board;
-import model.Disk;
+import model.PuissanceXBoard;
+import model.PuissanceXDisk;
 import model.PuissanceXStageModel;
 
 import java.util.Scanner;
@@ -76,7 +76,7 @@ public class PuissanceXController extends Controller {
 
     public void playTurn() {
         PuissanceXStageModel stageModel = (PuissanceXStageModel) model.getGameStage();
-        Board board = stageModel.getBoard();
+        PuissanceXBoard board = stageModel.getBoard();
         int currentPlayer = model.getIdPlayer();
         Player player = model.getPlayers().get(currentPlayer);
         
@@ -108,7 +108,7 @@ public class PuissanceXController extends Controller {
         }
     }
     
-    private void handleHumanPlayerTurn(Board board, int currentPlayer) {
+    private void handleHumanPlayerTurn(PuissanceXBoard board, int currentPlayer) {
         boolean validMove = false;
         
         while (!validMove) {
@@ -133,7 +133,7 @@ public class PuissanceXController extends Controller {
                 int row = board.getFirstEmptyRow(col);
                 
                 // Create a new disk
-                Disk disk = new Disk(currentPlayer, (PuissanceXStageModel)model.getGameStage());
+                PuissanceXDisk disk = new PuissanceXDisk(currentPlayer, (PuissanceXStageModel)model.getGameStage());
                 
                 // Create an action to place the disk
                 ActionList actions = ActionFactory.generatePutInContainer(model, disk, "board", row, col);
@@ -156,7 +156,7 @@ public class PuissanceXController extends Controller {
         }
     }
     
-    private void checkGameEndConditions(Board board) {
+    private void checkGameEndConditions(PuissanceXBoard board) {
         PuissanceXStageModel stageModel = (PuissanceXStageModel) model.getGameStage();
         int currentPlayer = model.getIdPlayer();
         

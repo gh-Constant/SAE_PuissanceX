@@ -3,10 +3,10 @@ package model;
 import boardifier.model.GameElement;
 import boardifier.model.GameStageModel;
 
-public class Disk extends GameElement {
+public class PuissanceXDisk extends GameElement {
     private int playerId;
     
-    public Disk(int playerId, GameStageModel gameStageModel) {
+    public PuissanceXDisk(int playerId, GameStageModel gameStageModel) {
         super(gameStageModel);
         this.playerId = playerId;
     }

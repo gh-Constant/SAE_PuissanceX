@@ -18,7 +18,7 @@ public class PuissanceXStageFactory extends StageElementsFactory {
         PuissanceXModel model = (PuissanceXModel) stageModel.getModel();
         
         // Create the board
-        Board board = new Board(model.getBoardRows(), 
+        PuissanceXBoard board = new PuissanceXBoard(model.getBoardRows(),
                                model.getBoardCols(), 
                                stageModel);
         stageModel.setBoard(board);

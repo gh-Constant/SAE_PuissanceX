@@ -2,23 +2,23 @@ package view;
 
 import boardifier.view.ConsoleColor;
 import boardifier.view.ElementLook;
-import model.Disk;
+import model.PuissanceXDisk;
 
 public class DiskLook extends ElementLook {
-    public DiskLook(Disk disk) {
-        super(disk, 3, 5);
+    public DiskLook(PuissanceXDisk puissanceXDisk) {
+        super(puissanceXDisk, 3, 5);
         setAnchorType(ANCHOR_TOPLEFT);
         render();
     }
 
     @Override
     public void render() {
-        Disk disk = (Disk) element;
+        PuissanceXDisk puissanceXDisk = (PuissanceXDisk) element;
         setSize(getWidth(), getHeight());
 
         String color;
         String symbol;
-        if (disk.getPlayerId() == 0) {
+        if (puissanceXDisk.getPlayerId() == 0) {
             color = ConsoleColor.RED_BACKGROUND;
             symbol = ConsoleColor.RED_BOLD + "●" + ConsoleColor.RESET;
         } else {

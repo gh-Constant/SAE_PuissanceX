@@ -4,10 +4,10 @@ import boardifier.model.Model;
 import boardifier.control.Controller;
 import boardifier.model.action.ActionList;
 import boardifier.control.ActionFactory;
+import model.PuissanceXDisk;
 import model.PuissanceXModel;
 import model.PuissanceXStageModel;
-import model.Board;
-import model.Disk;
+import model.PuissanceXBoard;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,7 +32,7 @@ public class RandomAIDecider extends control.PuissanceXDecider {
         
         PuissanceXModel model = (PuissanceXModel) this.model;
         PuissanceXStageModel stageModel = (PuissanceXStageModel) model.getGameStage();
-        Board board = stageModel.getBoard();
+        PuissanceXBoard board = stageModel.getBoard();
 
         // Find all columns that are not full
         List<Integer> availableCols = new ArrayList<>();
@@ -52,10 +52,10 @@ public class RandomAIDecider extends control.PuissanceXDecider {
 
         // Create a new disk for the current player
         int currentPlayer = model.getIdPlayer();
-        Disk disk = new Disk(currentPlayer, stageModel);
+        PuissanceXDisk puissanceXDisk = new PuissanceXDisk(currentPlayer, stageModel);
 
         // Create the action to put the disk in the chosen column
-        ActionList actions = ActionFactory.generatePutInContainer(model, disk, "board", row, chosenCol);
+        ActionList actions = ActionFactory.generatePutInContainer(model, puissanceXDisk, "board", row, chosenCol);
         actions.setDoEndOfTurn(true);
         
         System.out.println("AI player " + (currentPlayer + 1) + " chooses column " + chosenCol);
