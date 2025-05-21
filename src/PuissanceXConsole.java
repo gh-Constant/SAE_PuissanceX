@@ -92,15 +92,13 @@ public class PuissanceXConsole {
         
         control.setFirstStageName("puissanceX");
         Logger.debug("First stage name set to 'puissanceX'.");
+        
 
-
-        Logger.info("Attempting to start game...");
-        control.startGame();
-        Logger.info("Game started successfully. Entering stage loop.");
-        control.stageLoop();
         try {
-
-
+            Logger.info("Attempting to start game...");
+            control.startGame();
+            Logger.info("Game started successfully. Entering stage loop.");
+            control.stageLoop();
             Logger.info("Stage loop exited. Game ended.");
         } catch (Exception e) {
             Logger.info("An unexpected error occurred: " + e.getMessage() + ". Aborting.");
