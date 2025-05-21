@@ -33,9 +33,10 @@ public class Minimax extends PuissanceXDecider {
         this.root = new Tree(board.getNbCols(), true, -1);
 
 
-        int depth = 1;
+        int depth = 3;
         COUNT_OPERATIONS = 0;
         this.root.mimimax((PuissanceXModel) this.model, this.control, depth, -Minimax.WIN_SCORE, Minimax.WIN_SCORE);
+
 
         /*
         long startTime = System.currentTimeMillis();
@@ -189,7 +190,8 @@ class Tree {
             }
             this.children[i] = new Tree(this.nbCols, !this.isMaximizing, i);
             Score childScore = this.children[i].mimimax(model, control, depth - 1, alpha, beta);
-            this.children[i].cancelAction(model, control, actionRow, this.actionCol);
+            this.children[i].cancelAction(model, control);
+
 
             if (this.isMaximizing) {
                 alpha = Math.max(alpha, childScore.evaluationValue);
@@ -218,11 +220,43 @@ class Tree {
 
 
     public static boolean play(PuissanceXModel model, Controller control, int row, int col) {
-        
+        PuissanceXStageModel stageModel = (PuissanceXStageModel) model.getGameStage();
+        PuissanceXBoard board = stageModel.getBoard();
+
+        int currentPlayer = model.getIdPlayer();
+        System.out.println("Current player: " + currentPlayer);
+
+        PuissanceXDisk disk = new PuissanceXDisk(currentPlayer, (PuissanceXStageModel) model.getGameStage());
+
+        // Create an action to place the disk
+        ActionList actions = ActionFactory.generatePutInContainer(model, disk, "board", row, col);
+        actions.setDoEndOfTurn(true);
+
+        // Play the action
+        ActionPlayer actionPlayer = new ActionPlayer(model, control, actions);
+        actionPlayer.start();
+
+        model.setNextPlayer();
+
+        return stageModel.checkWin(row, col, currentPlayer);
     }
 
-    public void cancelAction(PuissanceXModel model, Controller control, int row, int col) {
+    public void cancelAction(PuissanceXModel model, Controller control) {
 
+        PuissanceXStageModel stageModel = (PuissanceXStageModel) model.getGameStage();
+        PuissanceXBoard board = stageModel.getBoard();
+        model.setNextPlayer();
+
+        int row = board.getFirstEmptyRow(this.actionCol) + 1;
+
+        PuissanceXDisk disk = (PuissanceXDisk) board.getElement(row, this.actionCol);
+
+        // Create an action to place the disk
+        ActionList actions = ActionFactory.generateRemoveFromStage(model, disk);
+        actions.setDoEndOfTurn(true);
+
+        ActionPlayer actionPlayer = new ActionPlayer(model, control, actions);
+        actionPlayer.start();
     }
 
     private static float evaluateAlign(PuissanceXModel model, int row, int col, int id) {
