@@ -33,8 +33,9 @@ public class Minimax extends PuissanceXDecider {
         this.root = new Tree(board.getNbCols(), true, -1);
 
 
-        int depth = 3;
+        int depth = 5;
         COUNT_OPERATIONS = 0;
+        Logger.setLevel(Logger.LOGGER_NONE);
         this.root.mimimax((PuissanceXModel) this.model, this.control, depth, -Minimax.WIN_SCORE, Minimax.WIN_SCORE);
 
 
@@ -45,6 +46,7 @@ public class Minimax extends PuissanceXDecider {
             depth += 1;
         }
         */
+        Logger.setLevel(Logger.LOGGER_TRACE);
         Logger.info(COUNT_OPERATIONS + " operations");
 
         int chosenCol = this.root.getBestChildren().getActionCol();
@@ -224,7 +226,6 @@ class Tree {
         PuissanceXBoard board = stageModel.getBoard();
 
         int currentPlayer = model.getIdPlayer();
-        System.out.println("Current player: " + currentPlayer);
 
         PuissanceXDisk disk = new PuissanceXDisk(currentPlayer, (PuissanceXStageModel) model.getGameStage());
 
@@ -266,7 +267,6 @@ class Tree {
         float score = 0;
         if (stageModel.checkWin(row, col, id)) {
             score += Minimax.WIN_SCORE * winCondition;
-            System.out.print(score + " - ");
         }
 
         for (int i = stageModel.getWinCondition(); i > 1; i--) {
@@ -300,7 +300,7 @@ class Tree {
         float score = 0;
 
         for (int col = 0; col < nbCols; col++) {
-            float note = Math.abs(center - col) / center;
+            float note = 1 - (Math.abs(center - col) / center); // center disk are better
 
             for (int row = 0; row < nbRows; row++) {
                 if (board.getElements(row, col).isEmpty() || !(board.getElements(row, col).getFirst() instanceof PuissanceXDisk)) {
