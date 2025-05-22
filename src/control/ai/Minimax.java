@@ -1,22 +1,18 @@
 package control.ai;
 
-import boardifier.control.ActionFactory;
-import boardifier.control.ActionPlayer;
 import boardifier.control.Controller;
 import boardifier.control.Logger;
 import boardifier.model.Model;
-import boardifier.model.Player;
 import boardifier.model.action.ActionList;
 import control.PuissanceXDecider;
+import control.SimplifyBoard;
 import model.PuissanceXBoard;
-import model.PuissanceXDisk;
-import model.PuissanceXModel;
 import model.PuissanceXStageModel;
 
 public class Minimax extends PuissanceXDecider {
     private Tree root;
-    public static final int WIN_SCORE = 1_000_000;
-    public static final int WIN_ALIGN_SCORE = 10_000;
+    public static final int WIN_SCORE = 1_000_000_000;
+    public static final int DEFAULT_DEPTH = 1;
 
     public static int COUNT_OPERATIONS = 0;
 
@@ -30,13 +26,12 @@ public class Minimax extends PuissanceXDecider {
         PuissanceXStageModel stageModel = (PuissanceXStageModel) model.getGameStage();
         PuissanceXBoard board = stageModel.getBoard();
 
-        this.root = new Tree(board.getNbCols(), true, -1);
+        this.root = new Tree(new SimplifyBoard(board), board.getNbRows(), board.getNbCols(), model.getIdPlayer() == 1, -1, stageModel.getWinCondition());
 
 
-        int depth = 5;
+        int depth = DEFAULT_DEPTH;
         COUNT_OPERATIONS = 0;
-        Logger.setLevel(Logger.LOGGER_NONE);
-        this.root.mimimax((PuissanceXModel) this.model, this.control, depth, -Minimax.WIN_SCORE, Minimax.WIN_SCORE);
+        this.root.mimimax(depth, -WIN_SCORE, WIN_SCORE);
 
 
         /*
@@ -46,140 +41,78 @@ public class Minimax extends PuissanceXDecider {
             depth += 1;
         }
         */
-        Logger.setLevel(Logger.LOGGER_TRACE);
+        Tree BestChild = this.root.getBestChildren();
+
         Logger.info(COUNT_OPERATIONS + " operations");
+        Logger.info("player : " + model.getIdPlayer());
+        Logger.info("Score : " + BestChild.getScore());
 
-        int chosenCol = this.root.getBestChildren().getActionCol();
 
-        return this.getActions(chosenCol);
+        return this.getActions(BestChild.getActionCol());
     }
 }
 
-
-class Score {
-    enum EvaluationType {
-        EQUAL_TO,
-        LESS_THAN,
-        MORE_THAN,
-        UNDEFINED
-    }
-    public float evaluationValue;
-    public EvaluationType evaluationType;
-
-    public Score() {
-        this.evaluationType = EvaluationType.UNDEFINED;
-        this.evaluationValue = 0.0f;
-    }
-
-    public Score(float evaluationValue) {
-        this.evaluationValue = evaluationValue;
-        this.evaluationType = EvaluationType.EQUAL_TO;
-    } 
-
-}
 
 class Tree {
-    private Score score;
+    private final int winCondition;
+    private final int id;
+    private float score;
     private final boolean isMaximizing;
 
+    private SimplifyBoard board;
+    private final int nbRows;
     private final int nbCols;
+
     private Tree[] children;
+    private Tree bestChild;
 
     private final int actionCol;
 
     private boolean isLeaf;
 
 
-    public Tree(int nbCols, boolean isMaximizing, int actionCol) {
+    public Tree(SimplifyBoard board, int nbRows, int nbCols, boolean isMaximizing, int actionCol, int winCondition) {
+        this.board = board;
+        this.nbRows = nbRows;
         this.nbCols = nbCols;
+
         this.isMaximizing = isMaximizing;
+        this.id = isMaximizing ? 1 : 0;
         this.children = new Tree[nbCols];
+        this.bestChild = null;
         this.actionCol = actionCol;
-        this.score = new Score();
+
+        if (this.isMaximizing) {
+            this.score = -Minimax.WIN_SCORE;
+        } else {
+            this.score = Minimax.WIN_SCORE;
+        }
+        this.winCondition = winCondition;
         this.isLeaf = false;
     }
 
 
 
     public Tree getBestChildren() {
-        Tree bestChild = null;
-
-
-        for (int i = 0; i < nbCols; i++) {
-            Tree child = children[i];
-            if (child == null) {
-                continue;
-            }
-            if (bestChild == null) {
-                bestChild = child;
-            } else if (this.isMaximizing) {
-                if (child.score.evaluationValue > bestChild.score.evaluationValue) {
-                    bestChild = child;
-                    bestChild.score.evaluationValue = child.score.evaluationValue;
-                }
-            } else {
-                if (child.score.evaluationValue < bestChild.score.evaluationValue) {
-                    bestChild = child;
-                    bestChild.score.evaluationValue = child.score.evaluationValue;
-                }
-            }
-
-        }
-
-        return bestChild;
+        return this.bestChild;
     }
 
-    public boolean isCompleted() {
-        for (int i = 0; i < nbCols; i++) {
-            Tree child = children[i];
-            if (child == null) {
-                return false;
-            }
-        }
-        return true;
-    }
 
-    public void calculateBestScore(PuissanceXModel model) {
-        if (this.isCompleted()) {
-            if (this.isMaximizing) {
-                this.score.evaluationType = Score.EvaluationType.MORE_THAN;
-            } else {
-                this.score.evaluationType = Score.EvaluationType.LESS_THAN;
-            }
-        }
-
-        Tree bestChild = this.getBestChildren();
-        if (bestChild == null) {
-            this.score = new Score(Tree.evaluate(model));
-        } else {
-            this.score.evaluationValue = bestChild.score.evaluationValue;
-        }
-    }
-
-    public Score getScore() {
-        return this.score;
-    }
-
-    public Score mimimax(PuissanceXModel model, Controller control, int depth,
+    public float mimimax(int depth,
                          float alpha, float beta // value should be more than x or less than x to be worth calculate
     ) {
-
-        PuissanceXStageModel stageModel = (PuissanceXStageModel) model.getGameStage();
-        PuissanceXBoard board = stageModel.getBoard();
-
         boolean isWinMove = false;
         Minimax.COUNT_OPERATIONS++;
-        int actionRow = board.getFirstEmptyRow(this.actionCol);
 
         if (this.actionCol != -1) {
-            isWinMove = Tree.play(model, control, actionRow, this.actionCol);
+            isWinMove = this.play();
         }
 
 
         if (depth <= 0 || isWinMove || board.isFull()) {
             this.isLeaf = true;
-            this.score.evaluationType = Score.EvaluationType.EQUAL_TO;
-            this.score.evaluationValue = Tree.evaluate(model);
+
+            this.evaluate(isWinMove);
             return this.score;
         }
 
@@ -187,136 +120,97 @@ class Tree {
         this.isLeaf = false;
 
         for (int i = 0; i < this.nbCols; i++) {
-            if (board.isColumnFull(i)) {
+            if (board.isColumnFull(i)) { // TODO
                 continue;
             }
-            this.children[i] = new Tree(this.nbCols, !this.isMaximizing, i);
-            Score childScore = this.children[i].mimimax(model, control, depth - 1, alpha, beta);
-            this.children[i].cancelAction(model, control);
+            this.children[i] = new Tree(this.board, this.nbRows , this.nbCols, !this.isMaximizing, i, this.winCondition);
+            float childScore = this.children[i].mimimax(depth - 1, alpha, beta);
+            this.children[i].back();
 
 
             if (this.isMaximizing) {
-                alpha = Math.max(alpha, childScore.evaluationValue);
+                alpha = Math.max(alpha, childScore);
+                if (bestChild == null || childScore > this.bestChild.getScore()) {
+                    this.score = childScore;
+                    this.bestChild = this.children[i];
+                }
             } else {
-                beta = Math.min(beta, childScore.evaluationValue);
+                beta = Math.min(beta, childScore);
+                if (bestChild == null || childScore < this.bestChild.getScore()) {
+                    this.score = childScore;
+                    this.bestChild = this.children[i];
+                }
             }
-            // Logger.debug(alpha + "," + beta + " --> " + childScore.evaluationValue);
 
-            if (alpha >= beta) {
-                break;
+            if (alpha > beta) {
+                return this.score;
             }
-
         }
 
-
-        calculateBestScore(model);
-
         return this.score;
+    }
+
+    public boolean play() {
+        this.board.add(this.actionCol, this.id);
+        return board.checkWin(this.actionCol, this.winCondition);
+    }
+
+    public void back() {
+        this.board.suppr(this.actionCol);
     }
 
     public int getActionCol() {
         return this.actionCol;
     }
 
-
-
-
-    public static boolean play(PuissanceXModel model, Controller control, int row, int col) {
-        PuissanceXStageModel stageModel = (PuissanceXStageModel) model.getGameStage();
-        PuissanceXBoard board = stageModel.getBoard();
-
-        int currentPlayer = model.getIdPlayer();
-
-        PuissanceXDisk disk = new PuissanceXDisk(currentPlayer, (PuissanceXStageModel) model.getGameStage());
-
-        // Create an action to place the disk
-        ActionList actions = ActionFactory.generatePutInContainer(model, disk, "board", row, col);
-        actions.setDoEndOfTurn(true);
-
-        // Play the action
-        ActionPlayer actionPlayer = new ActionPlayer(model, control, actions);
-        actionPlayer.start();
-
-        model.setNextPlayer();
-
-        return stageModel.checkWin(row, col, currentPlayer);
-    }
-
-    public void cancelAction(PuissanceXModel model, Controller control) {
-
-        PuissanceXStageModel stageModel = (PuissanceXStageModel) model.getGameStage();
-        PuissanceXBoard board = stageModel.getBoard();
-        model.setNextPlayer();
-
-        int row = board.getFirstEmptyRow(this.actionCol) + 1;
-
-        PuissanceXDisk disk = (PuissanceXDisk) board.getElement(row, this.actionCol);
-
-        // Create an action to place the disk
-        ActionList actions = ActionFactory.generateRemoveFromStage(model, disk);
-        actions.setDoEndOfTurn(true);
-
-        ActionPlayer actionPlayer = new ActionPlayer(model, control, actions);
-        actionPlayer.start();
-    }
-
-    private static float evaluateAlign(PuissanceXModel model, int row, int col, int id) {
-        PuissanceXStageModel stageModel = (PuissanceXStageModel) model.getGameStage();
-        int winCondition = stageModel.getWinCondition();
-
+    private float evaluateAlign(int row, int col) { // TODO: improve
         float score = 0;
-        if (stageModel.checkWin(row, col, id)) {
-            score += Minimax.WIN_SCORE * winCondition;
-        }
 
-        for (int i = stageModel.getWinCondition(); i > 1; i--) {
-            stageModel.setWinCondition(i);
-            if (stageModel.checkWin(row, col, id)) {
-                score += i * Minimax.WIN_ALIGN_SCORE / ((float) Math.pow(10, (winCondition-i+1)));
+        for (int i = winCondition; i > 1; i--) {
+            if (board.checkWin(row, col, i)) {
+                score += ((float) Math.pow(5, i));
             }
         }
 
-        stageModel.setWinCondition(winCondition);
         return score;
     }
 
-    public static float evaluate(PuissanceXModel model) { // TODO: need to be improved
-        PuissanceXStageModel stageModel = (PuissanceXStageModel) model.getGameStage();
-        PuissanceXBoard board = stageModel.getBoard();
-
-        int nbCols = board.getNbCols();
-        float center = ((float) nbCols) / 2;
-        int nbRows = board.getNbRows();
-
-        int PLAYER_ID, AI_ID;
-        if (model.getPlayers().getFirst().getType() == Player.HUMAN) {
-            PLAYER_ID = 0;
-            AI_ID = 1;
-        } else {
-            PLAYER_ID = 1;
-            AI_ID = 0;
+    public void evaluate(boolean isWinMove) {
+        if (isWinMove) {
+            if (this.isMaximizing) {
+                this.score = Minimax.WIN_SCORE - board.getNbDisk();
+            } else {
+                this.score = -Minimax.WIN_SCORE + board.getNbDisk();
+            }
+            return;
         }
+
+        float center = ((float) this.nbCols) / 2;
+
 
         float score = 0;
 
         for (int col = 0; col < nbCols; col++) {
-            float note = 1 - (Math.abs(center - col) / center); // center disk are better
+            float note = (1 - (Math.abs(center - col) / center)) * 5; // center disk are better
 
             for (int row = 0; row < nbRows; row++) {
-                if (board.getElements(row, col).isEmpty() || !(board.getElements(row, col).getFirst() instanceof PuissanceXDisk)) {
+                if (board.get(row, col) == -1) {
                     continue;
                 }
-                if (((PuissanceXDisk) board.getElements(row, col).getFirst()).getPlayerId() == AI_ID) {
+                if (board.get(row, col) == this.id) {
                     score += note;
-                    score += Tree.evaluateAlign(model, row, col, AI_ID);
-                } else if (((PuissanceXDisk) board.getElements(row, col).getFirst()).getPlayerId() == PLAYER_ID) {
+                    score += this.evaluateAlign(row, col);
+                } else {
                     score -= note;
-                    score -= Tree.evaluateAlign(model, row, col, PLAYER_ID);
+                    score -= this.evaluateAlign(row, col);
                 }
             }
         }
 
-        return score;
+        this.score = score;
     }
 
+    public float getScore() {
+        return this.score;
+    }
 }
