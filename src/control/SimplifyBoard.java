@@ -174,4 +174,12 @@ public class SimplifyBoard {
     public int getNbDisk() {
         return nbDisk;
     }
+
+    public int getNbRows() {
+        return nbRows;
+    }
+
+    public int getNbCols() {
+        return nbCols;
+    }
 }
