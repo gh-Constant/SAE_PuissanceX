@@ -13,7 +13,7 @@ public class GridLook extends ContainerLook {
     }
 
     public GridLook(int rowHeight, int colWidth, ContainerElement containerElement, int depth, int innersTop, int innersLeft, int borderWidth) {
-        super(containerElement, rowHeight, colWidth, depth, innersTop, innersLeft);
+        super(containerElement, rowHeight + 1, colWidth + 1, depth, innersTop, innersLeft);  // Add 1 to rowHeight and colWidth
 
         // force cell dimensions to at least >= 1
         if (rowHeight < 1) {
@@ -62,6 +62,31 @@ public class GridLook extends ContainerLook {
         clearShape();
         renderBorders();
         renderInners();
+    }
+
+    @Override
+    protected void computeInnersLocation() {
+        int[][] rowSpans = ((ContainerElement)element).getRowSpans();
+        int[][] colSpans = ((ContainerElement)element).getColSpans();
+        int rowStart = 0;
+        for(int i=0;i<nbRows;i++) {
+            int colStart = 0;
+            for(int j=0;j<nbCols;j++) {
+                for(ElementLook look : grid[i][j]) {
+                    // x,y are the top-left corner of the zone where the look must be put.
+                    int x = colStart + paddingLeft[i][j];
+                    // Position the disk a bit lower than before (removed the -1)
+                    int y = rowStart + paddingTop[i][j];
+                    
+                    // Move the look to the adjusted position
+                    if ((x != look.getElement().getX()) || (y != look.getElement().getY())) {
+                        look.moveTo(x, y);
+                    }
+                }
+                colStart += colsWidth[j];
+            }
+            rowStart += rowsHeight[i];
+        }
     }
 
     protected void renderBorders() {
