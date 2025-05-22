@@ -10,11 +10,13 @@ import model.PuissanceXBoard;
 import model.PuissanceXStageModel;
 
 public class Minimax extends PuissanceXDecider {
-    private Tree root;
-    public static final int WIN_SCORE = 1_000_000_000;
-    public static final int DEFAULT_DEPTH = 1;
+    public static final float WIN_SCORE = 100_000_000;
+    public static final int DEFAULT_DEPTH = 8;
 
-    public static int COUNT_OPERATIONS = 0;
+    private int WIN_CONDITION = 4;
+    private int COUNT_OPERATIONS = 0;
+
+    private SimplifyBoard board;
 
     public Minimax(Model model, Controller control) {
         super(model, control);
@@ -23,16 +25,7 @@ public class Minimax extends PuissanceXDecider {
 
     @Override
     public ActionList decide() {
-        PuissanceXStageModel stageModel = (PuissanceXStageModel) model.getGameStage();
-        PuissanceXBoard board = stageModel.getBoard();
-
-        this.root = new Tree(new SimplifyBoard(board), board.getNbRows(), board.getNbCols(), model.getIdPlayer() == 1, -1, stageModel.getWinCondition());
-
-
-        int depth = DEFAULT_DEPTH;
-        COUNT_OPERATIONS = 0;
-        this.root.mimimax(depth, -WIN_SCORE, WIN_SCORE);
-
+        int col = solve(DEFAULT_DEPTH);
 
         /*
         long startTime = System.currentTimeMillis();
@@ -41,163 +34,126 @@ public class Minimax extends PuissanceXDecider {
             depth += 1;
         }
         */
-        Tree BestChild = this.root.getBestChildren();
 
         Logger.info(COUNT_OPERATIONS + " operations");
         Logger.info("player : " + model.getIdPlayer());
-        Logger.info("Score : " + BestChild.getScore());
+        // Logger.info("Score : " + BestChild.getScore());
 
-
-        return this.getActions(BestChild.getActionCol());
-    }
-}
-
-
-class Tree {
-    private final int winCondition;
-    private final int id;
-    private float score;
-    private final boolean isMaximizing;
-
-    private SimplifyBoard board;
-    private final int nbRows;
-    private final int nbCols;
-
-    private Tree[] children;
-    private Tree bestChild;
-
-    private final int actionCol;
-
-    private boolean isLeaf;
-
-
-    public Tree(SimplifyBoard board, int nbRows, int nbCols, boolean isMaximizing, int actionCol, int winCondition) {
-        this.board = board;
-        this.nbRows = nbRows;
-        this.nbCols = nbCols;
-
-        this.isMaximizing = isMaximizing;
-        this.id = isMaximizing ? 1 : 0;
-        this.children = new Tree[nbCols];
-        this.bestChild = null;
-        this.actionCol = actionCol;
-
-        if (this.isMaximizing) {
-            this.score = -Minimax.WIN_SCORE;
-        } else {
-            this.score = Minimax.WIN_SCORE;
-        }
-        this.winCondition = winCondition;
-        this.isLeaf = false;
+        return this.getActions(col);
     }
 
 
+    public int solve(int depth) {
+        PuissanceXStageModel stageModel = (PuissanceXStageModel) model.getGameStage();
+        PuissanceXBoard boardX = stageModel.getBoard();
+        this.board = new SimplifyBoard(boardX);
 
-    public Tree getBestChildren() {
-        return this.bestChild;
-    }
+        WIN_CONDITION = stageModel.getWinCondition();
+        COUNT_OPERATIONS = 0;
 
+        final int id = model.getIdPlayer();
+        float score = 0;
+        int col = -1;
 
-    public float mimimax(int depth,
-                         float alpha, float beta // value should be more than x or less than x to be worth calculate
-    ) {
-        boolean isWinMove = false;
-        Minimax.COUNT_OPERATIONS++;
-
-        if (this.actionCol != -1) {
-            isWinMove = this.play();
-        }
-
-
-        if (depth <= 0 || isWinMove || board.isFull()) {
-            this.isLeaf = true;
-
-            this.evaluate(isWinMove);
-            return this.score;
-        }
-
-
-        this.isLeaf = false;
-
-        for (int i = 0; i < this.nbCols; i++) {
-            if (board.isColumnFull(i)) { // TODO
+        for (int i = 0; i < board.getNbCols(); i++) {
+            if (board.isColumnFull(i)) {
                 continue;
             }
-            this.children[i] = new Tree(this.board, this.nbRows , this.nbCols, !this.isMaximizing, i, this.winCondition);
-            float childScore = this.children[i].mimimax(depth - 1, alpha, beta);
-            this.children[i].back();
 
-
-            if (this.isMaximizing) {
-                alpha = Math.max(alpha, childScore);
-                if (bestChild == null || childScore > this.bestChild.getScore()) {
-                    this.score = childScore;
-                    this.bestChild = this.children[i];
-                }
-            } else {
-                beta = Math.min(beta, childScore);
-                if (bestChild == null || childScore < this.bestChild.getScore()) {
-                    this.score = childScore;
-                    this.bestChild = this.children[i];
-                }
+            if (play(i, id)) {
+                score = WIN_SCORE - board.getNbDisk();
+                col = i;
+                break;
             }
 
-            if (alpha > beta) {
-                return this.score;
+            float s = mimimax(depth, id, -WIN_SCORE, WIN_SCORE);
+            if (col == -1 || s > score) {
+                score = s;
+                col = i;
             }
         }
 
-        return this.score;
+
+        Logger.info("AI player " + id + " selected column: " + col + " with score: " + score);
+        return col;
     }
 
-    public boolean play() {
-        this.board.add(this.actionCol, this.id);
-        return board.checkWin(this.actionCol, this.winCondition);
+    public float mimimax(int depth, int id,
+                         float alpha, float beta // value should be more than x or less than x to be worth calculate
+    ) {
+        COUNT_OPERATIONS++;
+
+        if (board.isFull()) {
+            return 0;
+        }
+
+        if (depth <= 0) {
+            return this.evaluate(id);
+        }
+
+        float score = -Minimax.WIN_SCORE;
+
+        for (int i = 0; i < this.board.getNbCols(); i++) {
+            if (board.isColumnFull(i)) {
+                continue;
+            }
+
+            if (play(i, id)) {
+                score = Minimax.WIN_SCORE - board.getNbDisk();
+                back(i);
+                break;
+            } else {
+                score = Math.max(score, -mimimax(depth - 1, 1 - id, -beta, -alpha));
+            }
+            back(i);
+
+            if (score >= beta) {
+                break;
+            }
+
+            alpha = Math.max(alpha, score);
+
+        }
+
+        return score;
     }
 
-    public void back() {
-        this.board.suppr(this.actionCol);
+    public boolean play(int col, int id) {
+        this.board.add(col, id);
+        return board.checkWin(col, WIN_CONDITION);
     }
 
-    public int getActionCol() {
-        return this.actionCol;
+    public void back(int col) {
+        this.board.suppr(col);
     }
+
 
     private float evaluateAlign(int row, int col) { // TODO: improve
         float score = 0;
 
-        for (int i = winCondition; i > 1; i--) {
+        for (int i = WIN_CONDITION; i > 1; i--) {
             if (board.checkWin(row, col, i)) {
-                score += ((float) Math.pow(5, i));
+                score += ((float) Math.pow(3, i));
             }
         }
 
         return score;
     }
 
-    public void evaluate(boolean isWinMove) {
-        if (isWinMove) {
-            if (this.isMaximizing) {
-                this.score = Minimax.WIN_SCORE - board.getNbDisk();
-            } else {
-                this.score = -Minimax.WIN_SCORE + board.getNbDisk();
-            }
-            return;
-        }
-
-        float center = ((float) this.nbCols) / 2;
+    public float evaluate(int id) {
+        float center = ((float) this.board.getNbCols()) / 2;
 
 
         float score = 0;
 
-        for (int col = 0; col < nbCols; col++) {
-            float note = (1 - (Math.abs(center - col) / center)) * 5; // center disk are better
+        for (int col = 0; col < this.board.getNbCols(); col++) {
+            float note = (0.5f - (Math.abs(center - col) / center)) * 5; // center disk are better
 
-            for (int row = 0; row < nbRows; row++) {
+            for (int row = 0; row < this.board.getNbRows(); row++) {
                 if (board.get(row, col) == -1) {
                     continue;
                 }
-                if (board.get(row, col) == this.id) {
+                if (board.get(row, col) == id) {
                     score += note;
                     score += this.evaluateAlign(row, col);
                 } else {
@@ -207,10 +163,6 @@ class Tree {
             }
         }
 
-        this.score = score;
-    }
-
-    public float getScore() {
-        return this.score;
+        return score;
     }
 }
