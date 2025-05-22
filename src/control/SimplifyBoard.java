@@ -10,11 +10,14 @@ public class SimplifyBoard {
     private int [][] board;
     private final int nbRows;
     private final int nbCols;
+    private int nbDisk;
 
     public SimplifyBoard(PuissanceXBoard board) {
         this.nbRows = board.getNbRows();
         this.nbCols = board.getNbCols();
         this.board = new int[this.nbRows][this.nbCols];
+
+        this.nbDisk = 0;
 
         for (int row = 0; row < board.getNbRows(); row++) {
             for (int col = 0; col < board.getNbCols(); col++) {
@@ -23,13 +26,29 @@ public class SimplifyBoard {
                     this.board[row][col] = -1;
                 } else {
                     this.board[row][col] = ((PuissanceXDisk) elt.getFirst()).getPlayerId();
+                    this.nbDisk++;
                 }
             }
         }
     }
 
+    public SimplifyBoard(SimplifyBoard other) {
+        this.nbRows = other.nbRows;
+        this.nbCols = other.nbCols;
+        this.nbDisk = other.nbDisk;
+        this.board = new int[this.nbRows][this.nbCols];
+
+        for (int row = 0; row < this.nbRows; row++) {
+            System.arraycopy(other.board[row], 0, this.board[row], 0, this.nbCols);
+        }
+    }
+
+    public SimplifyBoard copy() {
+        return new SimplifyBoard(this);
+    }
+
     public boolean isFull() {
-        for (int col = this.nbCols - 1; col >= 0; col--) {
+        for (int col = 0; col < this.nbCols; col++) {
             if (!this.isColumnFull(col)) {
                 return false;
             }
@@ -38,34 +57,43 @@ public class SimplifyBoard {
     }
 
     public boolean isColumnFull(int col) {
-        return this.board[this.nbRows - 1][col] != -1;
+        return this.board[0][col] != -1;
     }
 
-    public boolean add(int col, int id) {
-        for (int row = 0; row < this.nbRows; row++) {
-            if (this.board[this.nbRows][col] == -1) {
-                this.board[this.nbRows][col] = id;
-                return true;
-            }
-        }
-        return false;
-    }
-
-
-    public boolean suppr(int col) {
+    public void add(int col, int id) {
         for (int row = this.nbRows - 1; row >= 0; row--) {
-            if (this.board[this.nbRows][col] != -1) {
-                this.board[this.nbRows][col] = -1;
-                return true;
+            if (this.board[row][col] == -1) {
+                this.board[row][col] = id;
+                nbDisk++;
+                return;
             }
         }
-        return false;
     }
+
+
+    public void suppr(int col) {
+        for (int row = 0; row < this.nbRows; row++) {
+            if (this.board[row][col] != -1) {
+                this.board[row][col] = -1;
+                nbDisk--;
+                return;
+            }
+        }
+    }
+
 
     public int get(int row, int col) {
         return this.board[row][col];
     }
 
+    public boolean checkWin(int col, int winCondition) {
+        for (int row = 0; row < this.nbRows; row++) {
+            if (this.board[row][col] != -1) {
+                return this.checkWin(row, col, winCondition);
+            }
+        }
+        return false;
+    }
 
     public boolean checkWin(int row, int col, int winCondition) {
         // Check horizontal, vertical, and diagonal lines
@@ -143,5 +171,7 @@ public class SimplifyBoard {
         return count >= winCondition;
     }
 
-
+    public int getNbDisk() {
+        return nbDisk;
+    }
 }
