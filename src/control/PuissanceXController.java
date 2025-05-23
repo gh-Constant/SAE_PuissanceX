@@ -112,20 +112,23 @@ public class PuissanceXController extends Controller {
         boolean validMove = false;
         
         while (!validMove) {
-            System.out.println("Enter column number (0-" + (board.getNbCols() - 1) + "): ");
+            System.out.println("Enter column number (1-" + board.getNbCols() + "): ");
             try {
                 String input = scanner.nextLine();
-                int col = Integer.parseInt(input);
+                int userCol = Integer.parseInt(input);
+                
+                // Convert from 1-based (user-friendly) to 0-based (internal)
+                int col = userCol - 1;
                 
                 // Check if the column is valid
                 if (col < 0 || col >= board.getNbCols()) {
-                    System.out.println("Invalid column number. Try again.");
+                    System.out.println("Invalid column number. Please enter a number between 1 and " + board.getNbCols() + ".");
                     continue;
                 }
                 
                 // Check if the column is full
                 if (board.isColumnFull(col)) {
-                    System.out.println("Column is full. Try another one.");
+                    System.out.println("Column " + userCol + " is full. Try another one.");
                     continue;
                 }
                 

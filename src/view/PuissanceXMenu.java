@@ -57,6 +57,7 @@ public class PuissanceXMenu {
         System.out.println("║ • Game Mode: " + getGameModeString() + "              ║");
         System.out.println("║ • Board Size: " + boardRows + "x" + boardCols + "                  ║");
         System.out.println("║ • Win Condition: " + winCondition + "                  ║");
+        System.out.println("║ • Column Input: 1-" + boardCols + "                ║");
         System.out.println("╠════════════════════════════════════╣");
         System.out.println("║ 1. Start Game                      ║");
         System.out.println("║ 2. Change Game Mode                ║");
