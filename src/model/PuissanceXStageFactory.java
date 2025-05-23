@@ -35,12 +35,12 @@ public class PuissanceXStageFactory extends StageElementsFactory {
         int boardHeight = model.getBoardRows() * 3;
 
         // Red disk pot (Player 1) - positioned to the right of the board, upper position
-        PuissanceXDiskPot redPot = new PuissanceXDiskPot(boardWidth + 10, boardHeight/3, stageModel);
+        PuissanceXDiskPot redPot = new PuissanceXDiskPot(boardWidth * 2, boardHeight/3, stageModel);
         stageModel.addElement(redPot); // Add to stage model to make it visible
         model.setPlayer1Pot(redPot);
 
         // Yellow disk pot (Player 2) - positioned to the right of the board, lower position
-        PuissanceXDiskPot yellowPot = new PuissanceXDiskPot(boardWidth + 20, boardHeight/3, stageModel);
+        PuissanceXDiskPot yellowPot = new PuissanceXDiskPot(boardWidth * 2 + 10, boardHeight/3, stageModel);
         stageModel.addElement(yellowPot); // Add to stage model to make it visible
         model.setPlayer2Pot(yellowPot);
     }
