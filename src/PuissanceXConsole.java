@@ -4,6 +4,7 @@ import boardifier.view.View;
 import control.PuissanceXController;
 import control.ai.RandomAIDecider;
 import model.PuissanceXModel;
+import view.PuissanceXMenu;
 
 public class PuissanceXConsole {
     public static void main(String[] args) {
@@ -18,39 +19,63 @@ public class PuissanceXConsole {
         int boardRows = 6;
         int boardCols = 7;
         int currentGameMode = 1;
-
-        try {
-            if (args.length >= 1) {
-                winCondition = Integer.parseInt(args[0]);
-                Logger.debug("Parsed Win Condition argument: " + winCondition);
+        
+        // If no arguments are provided, show the menu
+        if (args.length == 0) {
+            PuissanceXMenu menu = new PuissanceXMenu();
+            boolean startGame = menu.showMenu();
+            
+            if (!startGame) {
+                Logger.info("User chose to exit. Goodbye!");
+                return;
             }
-            if (args.length >= 2) {
-                boardRows = Integer.parseInt(args[1]);
-                Logger.debug("Parsed rows argument: " + boardRows);
-            }
-            if (args.length >= 3) {
-                boardCols = Integer.parseInt(args[2]);
-                Logger.debug("Parsed columns argument: " + boardCols);
-            }
-            if (args.length >= 4) {
-                currentGameMode = Integer.parseInt(args[3]);
-                Logger.debug("Parsed mode argument: " + currentGameMode);
-            }
-        } catch (NumberFormatException e) {
-            Logger.info("Error parsing arguments: " + e.getMessage() + ". Review arguments. Some or all parameters will use defaults.");
+            
+            // Get settings from menu
+            winCondition = menu.getWinCondition();
+            boardRows = menu.getBoardRows();
+            boardCols = menu.getBoardCols();
+            currentGameMode = menu.getGameMode();
+            
+            Logger.info("Starting game with menu settings:");
+            Logger.info("  Win Condition: " + winCondition);
+            Logger.info("  Board rows: " + boardRows);
+            Logger.info("  Board columns: " + boardCols);
+            Logger.info("  Game mode: " + currentGameMode);
         }
+        else {
+            try {
+                if (args.length >= 1) {
+                    winCondition = Integer.parseInt(args[0]);
+                    Logger.debug("Parsed Win Condition argument: " + winCondition);
+                }
+                if (args.length >= 2) {
+                    boardRows = Integer.parseInt(args[1]);
+                    Logger.debug("Parsed rows argument: " + boardRows);
+                }
+                if (args.length >= 3) {
+                    boardCols = Integer.parseInt(args[2]);
+                    Logger.debug("Parsed columns argument: " + boardCols);
+                }
+                if (args.length >= 4) {
+                    currentGameMode = Integer.parseInt(args[3]);
+                    Logger.debug("Parsed mode argument: " + currentGameMode);
+                }
+            } catch (NumberFormatException e) {
+                Logger.info("Error parsing arguments: " + e.getMessage() + ". Review arguments. Some or all parameters will use defaults.");
+            }
 
-        // Game Mode validation
-        if (currentGameMode < 0 || currentGameMode > 2) {
-            Logger.info("Parsed game mode (" + currentGameMode + ") is invalid. Setting to 0 (Human vs Human).");
-            currentGameMode = 0;
+            // Game Mode validation
+            if (currentGameMode < 0 || currentGameMode > 2) {
+                Logger.info("Parsed game mode (" + currentGameMode + ") is invalid. Setting to 0 (Human vs Human).");
+                currentGameMode = 0;
+            }
+
+            Logger.info("Final effective game parameters set:");
+            Logger.info("  Win Condition: " + winCondition);
+            Logger.info("  Board rows: " + boardRows);
+            Logger.info("  Board columns: " + boardCols);
+            Logger.info("  Game mode: " + currentGameMode);
         }
-
-        Logger.info("Final effective game parameters set:");
-        Logger.info("  Win Condition: " + winCondition);
-        Logger.info("  Board rows: " + boardRows);
-        Logger.info("  Board columns: " + boardCols);
-        Logger.info("  Game mode: " + currentGameMode);
 
         // Initialize model with parameters
         PuissanceXModel model = new PuissanceXModel();
