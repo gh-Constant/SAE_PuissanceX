@@ -60,13 +60,9 @@ public class Minimax extends PuissanceXDecider {
                 continue;
             }
 
-            if (play(i, id)) {
-                score = WIN_SCORE - board.getNbDisk();
-                col = i;
-                break;
-            }
-
+            play(i, id);
             float s = mimimax(depth, id, -WIN_SCORE, WIN_SCORE);
+            back(i);
             if (col == -1 || s > score) {
                 score = s;
                 col = i;
@@ -98,13 +94,8 @@ public class Minimax extends PuissanceXDecider {
                 continue;
             }
 
-            if (play(i, id)) {
-                score = Minimax.WIN_SCORE - board.getNbDisk();
-                back(i);
-                break;
-            } else {
-                score = Math.max(score, -mimimax(depth - 1, 1 - id, -beta, -alpha));
-            }
+            play(i, id);
+            score = Math.max(score, -mimimax(depth - 1, 1 - id, -beta, -alpha));
             back(i);
 
             if (score >= beta) {
@@ -118,9 +109,8 @@ public class Minimax extends PuissanceXDecider {
         return score;
     }
 
-    public boolean play(int col, int id) {
+    public void play(int col, int id) {
         this.board.add(col, id);
-        return board.checkWin(col, WIN_CONDITION);
     }
 
     public void back(int col) {
@@ -154,9 +144,15 @@ public class Minimax extends PuissanceXDecider {
                     continue;
                 }
                 if (board.get(row, col) == id) {
+                    if (board.checkWin(row, col, WIN_CONDITION)) {
+                        return WIN_SCORE - board.getNbDisk();
+                    }
                     score += note;
                     score += this.evaluateAlign(row, col);
                 } else {
+                    if (board.checkWin(row, col, WIN_CONDITION)) {
+                        return -(WIN_SCORE - board.getNbDisk());
+                    }
                     score -= note;
                     score -= this.evaluateAlign(row, col);
                 }
