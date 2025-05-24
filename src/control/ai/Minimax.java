@@ -13,10 +13,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Minimax extends PuissanceXDecider {
-    private static long TOTAL_TIME = 0;
-    private static long TOTAL_COUNT_OPERATION = 0;
-
-
     public static final float WIN_SCORE = 100_000_000;
     public static final int DEFAULT_DEPTH = 10;
 
@@ -37,7 +33,6 @@ public class Minimax extends PuissanceXDecider {
 
         PuissanceXStageModel stageModel = (PuissanceXStageModel) model.getGameStage();
         PuissanceXBoard boardX = stageModel.getBoard();
-        SimplifyBoard oldBoard = board;
         this.board = new SimplifyBoard(boardX);
 
         WIN_CONDITION = stageModel.getWinCondition();
@@ -72,12 +67,8 @@ public class Minimax extends PuissanceXDecider {
         }
         System.out.println();
 
-        TOTAL_TIME += endTime - startTime;
-        TOTAL_COUNT_OPERATION += COUNT_OPERATIONS;
-
         Logger.info("AI player " + id + " selected column: " + col + " with score: " + scores[col]);
         Logger.info(COUNT_OPERATIONS + " operations en " + (endTime - startTime) / 1_000_000 + " ms");
-        Logger.info("Total : " + TOTAL_COUNT_OPERATION + " operations en " + TOTAL_TIME / 1_000_000 + " ms");
 
         return this.getActions(col);
     }
