@@ -4,6 +4,9 @@ import boardifier.model.ContainerElement;
 import boardifier.model.ElementTypes;
 import boardifier.model.GameStageModel;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class PuissanceXBoard extends ContainerElement {
 
     public static final String BOARD_NAME = "board";
@@ -35,5 +38,19 @@ public class PuissanceXBoard extends ContainerElement {
             }
         }
         return -1; // Column is full
+    }
+
+    public List<Integer> getAvailableCol() {
+        List<Integer> availableCols = new ArrayList<>();
+        for (int col = 0; col < this.getNbCols(); col++) {
+            if (!this.isColumnFull(col)) {
+                availableCols.add(col);
+            }
+        }
+        return availableCols;
+    }
+
+    public boolean isFull() {
+        return this.getAvailableCol().isEmpty();
     }
 }

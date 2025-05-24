@@ -4,6 +4,7 @@ import boardifier.model.GameElement;
 import model.PuissanceXBoard;
 import model.PuissanceXDisk;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class SimplifyBoard {
@@ -84,6 +85,20 @@ public class SimplifyBoard {
 
     public int get(int row, int col) {
         return this.board[row][col];
+    }
+  
+    public List<Integer> getDiffs(SimplifyBoard other) {
+        List<Integer> diffs = new ArrayList<>();
+        for (int col = 0; col < this.nbCols; col++) {
+            int n = 0;
+            for (int row = 0; row < this.nbRows; row++) {
+                if (this.board[row][col] != other.board[row][col]) {
+                    n++;
+                }
+            }
+            diffs.add(n);
+        }
+        return diffs;
     }
 
     public boolean checkWin(int col, int winCondition) {
@@ -175,11 +190,11 @@ public class SimplifyBoard {
         return nbDisk;
     }
 
-    public int getNbRows() {
-        return nbRows;
-    }
-
     public int getNbCols() {
         return nbCols;
+    }
+
+    public int getNbRows() {
+        return nbRows;
     }
 }
