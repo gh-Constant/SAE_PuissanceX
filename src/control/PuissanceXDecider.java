@@ -4,10 +4,12 @@ import boardifier.control.ActionFactory;
 import boardifier.control.Decider;
 import boardifier.model.GameElement;
 import boardifier.model.Model;
+import boardifier.control.ActionFactory;
 import boardifier.control.Controller;
 import model.PuissanceXBoard;
 import model.PuissanceXDisk;
 import model.PuissanceXModel;
+import model.PuissanceXStageModel;
 import boardifier.model.action.ActionList;
 import model.PuissanceXStageModel;
 

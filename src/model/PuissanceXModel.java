@@ -6,7 +6,9 @@ public class PuissanceXModel extends Model {
     private int boardRows;
     private int boardCols;
     private int winCondition;
-    
+    private PuissanceXDiskPot player1Pot; // Red pot
+    private PuissanceXDiskPot player2Pot; // Yellow pot
+
     public PuissanceXModel() {
         super();
         // Default values
@@ -37,5 +39,21 @@ public class PuissanceXModel extends Model {
     
     public int getWinCondition() {
         return winCondition;
+    }
+
+    public PuissanceXDiskPot getPlayer1Pot() {
+        return player1Pot;
+    }
+
+    public void setPlayer1Pot(PuissanceXDiskPot player1Pot) {
+        this.player1Pot = player1Pot;
+    }
+
+    public PuissanceXDiskPot getPlayer2Pot() {
+        return player2Pot;
+    }
+
+    public void setPlayer2Pot(PuissanceXDiskPot player2Pot) {
+        this.player2Pot = player2Pot;
     }
 }

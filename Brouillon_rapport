@@ -1,0 +1,207 @@
+1. Introduction (1-2 pages)
+1.1 Project Overview
+Based on: README.md (project structure, objectives)
+Game rules and objectives
+Technical requirements (Java 17, boardifier-console framework)
+1.2 Development Environment
+Based on: PuissanceX.iml, SAE_PuissanceX.iml
+Tools used (IntelliJ IDEA, Git)
+Framework overview (boardifier-console)
+
+
+2. Architecture and Implementation (4-5 pages)
+2.1 MVC Architecture Overview
+Based on: src/model/, src/view/, src/control/
+Framework integration
+Component interaction
+2.2 Model Implementation
+Based on: src/model/
+Key classes:
+PuissanceXModel
+PuissanceXStageModel
+PuissanceXBoard
+PuissanceXDisk
+State management
+Game logic implementation
+2.3 View Implementation
+Based on: src/view/
+Console display design
+Board visualization
+Player interface
+2.4 Controller Implementation
+Based on: src/control/
+Game flow management
+Input handling
+Player turn management
+
+
+3. AI Strategies (3-4 pages)
+3.1 Strategy Overview
+Based on: src/control/ai/
+Strategy selection mechanism
+Implementation approach
+3.2 Strategy 1: [Name of first strategy]
+Based on: [specific AI implementation file]
+Algorithm description
+Code analysis
+Performance metrics:
+Code volume
+Memory usage
+Execution time
+Effectiveness analysis:
+Win rate
+Performance in different scenarios
+3.3 Strategy 2: [Name of second strategy]
+Based on: [specific AI implementation file]
+Algorithm description
+Code analysis
+Performance metrics
+Effectiveness analysis
+3.4 Strategy Comparison
+Performance comparison
+Use case analysis
+Strengths and weaknesses
+
+
+4. Testing and Validation (2-3 pages)
+4.1 Unit Testing
+Based on: test/
+Test coverage
+Key test cases
+Testing methodology
+4.2 Input File Testing
+Based on: [test input files]
+Test scenarios:
+Normal game completion
+Special moves
+Invalid moves (syntax)
+Invalid moves (rules)
+Screenshots and analysis of each test case
+4.3 Performance Testing
+Based on: test results
+Response time analysis
+Memory usage patterns
+Stability assessment
+
+
+5. User Interface and Game Flow (2-3 pages)
+5.1 Console Interface
+Based on: src/view/
+Board display
+Player interaction
+Game state visualization
+5.2 Game Modes
+Based on: PuissanceXConsole.java
+Human vs Human
+Human vs Computer
+Computer vs Computer
+5.3 Input/Output Handling
+Based on: [input file implementations]
+Command syntax
+Error handling
+Game state management
+6. Conclusion and Future Work (1-2 pages)
+
+
+6.1 Project Achievements
+Based on: implementation results
+Key features implemented
+Technical challenges overcome
+6.2 Future Improvements
+Based on: current limitations
+Potential enhancements
+Version 2 considerations (JavaFX implementation)
+Appendices
+A. Code Samples
+Key algorithm implementations
+Critical class structures
+B. Test Results
+Detailed test cases
+Performance metrics
+C. Input File Examples
+Sample game scenarios
+Error handling examples
+D. Screenshots
+Game states
+Error messages
+Test results
+
+
+
+Introduction
+1.1 Project Overview
+PuissanceX is a modern implementation of the classic Connect-4 game, developed as part of an academic project (SAE) focusing on software development and artificial intelligence. The game is built using the Boardifier framework, providing a robust and extensible console interface.
+Project Context and Requirements
+The project was developed as part of the SAE (Situated Application Exercise) curriculum, with specific requirements:
+Implementation of a console-based Connect-4 game
+Development of at least two different AI strategies
+Creation of a technical report documenting the implementation
+Testing through various input files
+Future extension to JavaFX GUI implementation
+Project Structure
+The project follows a well-defined MVC (Model-View-Controller) architecture:
+Model: Manages game logic and state
+View: Handles display of game elements
+Controller: Coordinates interactions between model and view
+Game Objectives
+PuissanceX implements the classic Connect-4 rules:
+Two players compete on a 6x7 grid
+Players alternately place their disks in columns
+First player to align 4 disks horizontally, vertically, or diagonally wins
+Game is declared a draw if the grid is filled without a winner
+Technical Specifications
+Programming Language: Java 17
+Framework: boardifier-console for console interface
+Architecture: MVC (Model-View-Controller)
+Version Control: Git
+IDE: IntelliJ IDEA
+1.2 Development Environment
+Technical Configuration
+The project is configured to operate in a modern development environment:
+JDK: Java 17
+IDE: IntelliJ IDEA
+Module configuration via PuissanceX.iml
+Standard project structure with src directory for source code
+Integrated Java development support
+Development Tools
+Git: Used for version control
+IntelliJ IDEA: Integrated Development Environment
+Full Java development support
+Integrated debugging tools
+Dependency management
+Boardifier Framework
+The project utilizes the boardifier-console framework which provides:
+A ready-to-use MVC architecture
+Components for game board management
+Console display tools
+An extensible foundation for future developments (including JavaFX interface)
+Project Requirements Implementation
+The project addresses specific academic requirements:
+Game Modes:
+Human vs Human
+Human vs Computer
+Computer vs Computer
+AI Strategies:
+Random Strategy (implemented)
+MinMax Strategy (planned)
+Future: Deep Learning AI
+Testing Requirements:
+Input file testing (normal_game.txt, special_moves.txt, etc.)
+Unit testing
+Performance testing of AI strategies
+Documentation:
+Technical report
+Code documentation
+Strategy documentation
+Code Structure
+The source code is organized in a modular manner:
+src directory containing main source code
+Clear separation of responsibilities according to MVC architecture
+Standard Java project structure
+Module configuration via .iml files
+Project Timeline and Milestones
+The development follows a structured timeline:
+Console Visualization Implementation
+MinMax AI Implementation
+Deep Learning AI Development
+JavaFX GUI Implementation (Future)

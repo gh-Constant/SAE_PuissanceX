@@ -1,21 +1,43 @@
 package view;
 
+import boardifier.control.Logger;
 import boardifier.model.ContainerElement;
-import boardifier.view.TableLook;
+import boardifier.view.ConsoleColor;
+import boardifier.view.GridLook;
 
-/**
- * Black pot inherits from TableLook, using the constructor for
- * flexible cell sizes and a visible border. It implies that if there is no element in a cell
- * it has a zero size and thus, is not displayed. This is why during the game,
- * the black pot will reduce in size because of pawn are removed from the pot to be placed
- * on the main board. At then end, it will totally disappear.
- *
- * Note that this class is not necessary and the HoleStageView could create directly an instance of TableLook.
- * So, this subclass is just in case of we would like to change the look of the black pot in the future.
- */
-public class YellowDiskPot extends TableLook {
+public class YellowDiskPot extends GridLook {
 
-    public YellowDiskPot(ContainerElement containerElement) {
-        super(containerElement, -1, 1);
+    public YellowDiskPot(int rowHeight, int colWidth, ContainerElement containerElement) {
+        super(rowHeight, colWidth, containerElement, -1, 1);
+        setVerticalAlignment(ALIGN_MIDDLE);
+        setHorizontalAlignment(ALIGN_CENTER);
+    }
+
+    @Override
+    protected void render() {
+        super.render();
+    }
+
+    protected void renderBorders() {
+        Logger.debug("called", this);
+        for (int i = 0; i < nbRows; i++) {
+            shape[i * rowHeight][0] = "\u250F";
+            shape[i * rowHeight][colWidth] = "\u2513";
+            shape[(i + 1) * rowHeight][0] = "\u2517";
+            shape[(i + 1) * rowHeight][colWidth] = "\u251B";
+
+            for (int k = 1; k < colWidth; k++) {
+                shape[i * rowHeight][k] = "\u2501";
+                shape[(i + 1) * rowHeight][k] = "\u2501";
+            }
+            for (int k = 1; k < rowHeight; k++) {
+                shape[i * rowHeight + k][0] = "\u2503";
+                shape[i * rowHeight + k][colWidth] = "\u2503";
+            }
+        }
+        for (int i = 1; i < nbRows; i++) {
+            shape[i * rowHeight][0] = "\u2523";
+            shape[i * rowHeight][colWidth] = "\u252B";
+        }
     }
 }

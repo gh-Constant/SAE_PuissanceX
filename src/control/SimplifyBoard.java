@@ -86,7 +86,7 @@ public class SimplifyBoard {
     public int get(int row, int col) {
         return this.board[row][col];
     }
-
+  
     public List<Integer> getDiffs(SimplifyBoard other) {
         List<Integer> diffs = new ArrayList<>();
         for (int col = 0; col < this.nbCols; col++) {
