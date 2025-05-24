@@ -9,6 +9,13 @@ import control.ai.ConditionAI;
 import model.PuissanceXModel;
 
 public class PuissanceXConsole {
+    /**
+     * Entry point for the PuissanceX console application.
+     *
+     * Parses command-line arguments to configure game parameters, initializes the game model, sets up players and AI based on the selected mode, registers the model and view, and starts the game loop. Logs key events and errors throughout execution.
+     *
+     * @param args Optional command-line arguments: win condition, board rows, board columns, and game mode.
+     */
     public static void main(String[] args) {
         // Initialize boardifier logger settings
         Logger.setLevel(Logger.LOGGER_TRACE); 
