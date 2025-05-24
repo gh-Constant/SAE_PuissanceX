@@ -9,6 +9,9 @@ import control.SimplifyBoard;
 import model.PuissanceXBoard;
 import model.PuissanceXStageModel;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Minimax extends PuissanceXDecider {
     public static final float WIN_SCORE = 100_000_000;
     public static final int DEFAULT_DEPTH = 12;
@@ -17,6 +20,7 @@ public class Minimax extends PuissanceXDecider {
     private int COUNT_OPERATIONS = 0;
 
     private SimplifyBoard board;
+    List<Integer> DEFAULT_SEARCH_ORDER;
 
     public Minimax(Model model, Controller control) {
         super(model, control);
@@ -25,13 +29,16 @@ public class Minimax extends PuissanceXDecider {
 
     @Override
     public ActionList decide() {
+        long startTime = System.nanoTime();
+
         PuissanceXStageModel stageModel = (PuissanceXStageModel) model.getGameStage();
         PuissanceXBoard boardX = stageModel.getBoard();
+        SimplifyBoard oldBoard = board;
         this.board = new SimplifyBoard(boardX);
 
         WIN_CONDITION = stageModel.getWinCondition();
         COUNT_OPERATIONS = 0;
-
+        calculateDefaultSearchOrder();
 
         int col = -1;
         float bestScore = -WIN_SCORE;
@@ -39,19 +46,28 @@ public class Minimax extends PuissanceXDecider {
         final int id = model.getIdPlayer();
         float[] scores = new float[board.getNbCols()];
 
-        for (int i = 0; i < board.getNbCols(); i++) {
-            if (board.isColumnFull(i)) {
+        calculateSearchOrder(findLastMove(oldBoard));
+        List<Integer> alreadySearched = new ArrayList<>();
+        for (int c : DEFAULT_SEARCH_ORDER) {
+            if (c == -1 || alreadySearched.contains(c)) {
+                continue;
+            }
+            alreadySearched.add(c);
+
+            if (board.isColumnFull(c)) {
                 continue;
             }
 
-            makeMove(i, id);
-            scores[i] = -negamax(DEFAULT_DEPTH-1, 1-id, i, -WIN_SCORE, WIN_SCORE);
-            if (col == -1 || scores[i] > bestScore) {
-                bestScore = scores[i];
-                col = i;
+            makeMove(c, id);
+            scores[c] = -negamax(DEFAULT_DEPTH-1, 1-id, c, -WIN_SCORE, WIN_SCORE);
+            if (col == -1 || scores[c] > bestScore) {
+                bestScore = scores[c];
+                col = c;
             }
-            undoMove(i);
+            undoMove(c);
         }
+
+        long endTime = System.nanoTime();
 
         System.out.printf("%.0f", scores[0]);
         for (int i = 1; i < board.getNbCols(); i++) {
@@ -60,7 +76,7 @@ public class Minimax extends PuissanceXDecider {
         System.out.println();
 
         Logger.info("AI player " + id + " selected column: " + col + " with score: " + scores[col]);
-        Logger.info(COUNT_OPERATIONS + " operations");
+        Logger.info(COUNT_OPERATIONS + " operations en " + (endTime - startTime) / 1_000_000 + " ms");
 
         return this.getActions(col);
     }
@@ -84,7 +100,14 @@ public class Minimax extends PuissanceXDecider {
 
         float score = -(WIN_SCORE - board.getNbDisk());
 
-        for (int c = 0; c < this.board.getNbCols(); c++) {
+        calculateSearchOrder(col);
+        List<Integer> alreadySearched = new ArrayList<Integer>();
+        for (int c : DEFAULT_SEARCH_ORDER) {
+            if (c == -1 || alreadySearched.contains(c)) {
+                continue;
+            }
+            alreadySearched.add(c);
+
             if (board.isColumnFull(c)) {
                 continue;
             }
@@ -103,6 +126,62 @@ public class Minimax extends PuissanceXDecider {
 
         return score;
     }
+
+    private int findLastMove(SimplifyBoard oldBoard) {
+        if (oldBoard == null || this.board.getNbDisk() != oldBoard.getNbDisk() + 1) {
+            return -1;
+        }
+        List<Integer> diff = this.board.getDiffs(oldBoard);
+
+        for (int i = 0; i < board.getNbCols(); i++) {
+            if (diff.get(i) != 0) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    private void calculateSearchOrder(int lastMove) {
+        DEFAULT_SEARCH_ORDER.set(0, lastMove);
+        DEFAULT_SEARCH_ORDER.set(1, lastMove);
+        DEFAULT_SEARCH_ORDER.set(2, lastMove);
+        if (lastMove == -1) {
+            return;
+        }
+
+        if (lastMove - 1 > 0) {
+            DEFAULT_SEARCH_ORDER.set(1, lastMove - 1);
+        }
+        if (lastMove + 1 < board.getNbCols()) {
+            DEFAULT_SEARCH_ORDER.set(2, lastMove + 1);
+        }
+    }
+
+    private void calculateDefaultSearchOrder() {
+        DEFAULT_SEARCH_ORDER = new ArrayList<>();
+
+        int nbCols = this.board.getNbCols();
+        int center = nbCols / 2;
+
+        DEFAULT_SEARCH_ORDER.add(-1);
+        DEFAULT_SEARCH_ORDER.add(-1);
+        DEFAULT_SEARCH_ORDER.add(-1);
+
+        DEFAULT_SEARCH_ORDER.add(center);
+        if (nbCols % 2 != 0) {
+            for (int i = 1; i <= center; i++) {
+                DEFAULT_SEARCH_ORDER.add(center - i);
+                DEFAULT_SEARCH_ORDER.add(center + i);
+            }
+        } else {
+            DEFAULT_SEARCH_ORDER.add(center - 1);
+            for (int i = 1; i <= center; i++) {
+                DEFAULT_SEARCH_ORDER.add(center - 1 - i);
+                DEFAULT_SEARCH_ORDER.add(center + i);
+            }
+        }
+    }
+
 
     public void makeMove(int col, int id) {
         this.board.add(col, id);
