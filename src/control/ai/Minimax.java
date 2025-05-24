@@ -11,7 +11,7 @@ import model.PuissanceXStageModel;
 
 public class Minimax extends PuissanceXDecider {
     public static final float WIN_SCORE = 100_000_000;
-    public static final int DEFAULT_DEPTH = 8;
+    public static final int DEFAULT_DEPTH = 12;
 
     private int WIN_CONDITION = 4;
     private int COUNT_OPERATIONS = 0;
@@ -25,25 +25,6 @@ public class Minimax extends PuissanceXDecider {
 
     @Override
     public ActionList decide() {
-        int col = solve(DEFAULT_DEPTH);
-
-        /*
-        long startTime = System.currentTimeMillis();
-        while (System.currentTimeMillis() - startTime < 3000) {
-            this.root.mimimax((PuissanceXModel) this.model, this.control, depth, -Minimax.WIN_SCORE, Minimax.WIN_SCORE);
-            depth += 1;
-        }
-        */
-
-        Logger.info(COUNT_OPERATIONS + " operations");
-        Logger.info("player : " + model.getIdPlayer());
-        // Logger.info("Score : " + BestChild.getScore());
-
-        return this.getActions(col);
-    }
-
-
-    public int solve(int depth) {
         PuissanceXStageModel stageModel = (PuissanceXStageModel) model.getGameStage();
         PuissanceXBoard boardX = stageModel.getBoard();
         this.board = new SimplifyBoard(boardX);
@@ -51,33 +32,47 @@ public class Minimax extends PuissanceXDecider {
         WIN_CONDITION = stageModel.getWinCondition();
         COUNT_OPERATIONS = 0;
 
-        final int id = model.getIdPlayer();
-        float score = 0;
+
         int col = -1;
+        float bestScore = -WIN_SCORE;
+
+        final int id = model.getIdPlayer();
+        float[] scores = new float[board.getNbCols()];
 
         for (int i = 0; i < board.getNbCols(); i++) {
             if (board.isColumnFull(i)) {
                 continue;
             }
 
-            play(i, id);
-            float s = mimimax(depth, id, -WIN_SCORE, WIN_SCORE);
-            back(i);
-            if (col == -1 || s > score) {
-                score = s;
+            makeMove(i, id);
+            scores[i] = -negamax(DEFAULT_DEPTH-1, 1-id, i, -WIN_SCORE, WIN_SCORE);
+            if (col == -1 || scores[i] > bestScore) {
+                bestScore = scores[i];
                 col = i;
             }
+            undoMove(i);
         }
 
+        System.out.printf("%.0f", scores[0]);
+        for (int i = 1; i < board.getNbCols(); i++) {
+            System.out.printf(" : %.0f", scores[i]);
+        }
+        System.out.println();
 
-        Logger.info("AI player " + id + " selected column: " + col + " with score: " + score);
-        return col;
+        Logger.info("AI player " + id + " selected column: " + col + " with score: " + scores[col]);
+        Logger.info(COUNT_OPERATIONS + " operations");
+
+        return this.getActions(col);
     }
 
-    public float mimimax(int depth, int id,
+    public float negamax(int depth, int id, int col,
                          float alpha, float beta // value should be more than x or less than x to be worth calculate
     ) {
         COUNT_OPERATIONS++;
+
+        if (board.checkWin(col, WIN_CONDITION)) {
+            return -(WIN_SCORE + depth);
+        }
 
         if (board.isFull()) {
             return 0;
@@ -87,33 +82,33 @@ public class Minimax extends PuissanceXDecider {
             return this.evaluate(id);
         }
 
-        float score = -Minimax.WIN_SCORE;
+        float score = -(WIN_SCORE - board.getNbDisk());
 
-        for (int i = 0; i < this.board.getNbCols(); i++) {
-            if (board.isColumnFull(i)) {
+        for (int c = 0; c < this.board.getNbCols(); c++) {
+            if (board.isColumnFull(c)) {
                 continue;
             }
 
-            play(i, id);
-            score = Math.max(score, -mimimax(depth - 1, 1 - id, -beta, -alpha));
-            back(i);
+            makeMove(c, id);
+            score = Math.max(score, -negamax(depth - 1, 1 - id, c, -beta, -alpha));
+            undoMove(c);
 
-            if (score >= beta) {
-                break;
-            }
 
             alpha = Math.max(alpha, score);
 
+            if (alpha >= beta) {
+                break;
+            }
         }
 
         return score;
     }
 
-    public void play(int col, int id) {
+    public void makeMove(int col, int id) {
         this.board.add(col, id);
     }
 
-    public void back(int col) {
+    public void undoMove(int col) {
         this.board.suppr(col);
     }
 
@@ -123,7 +118,7 @@ public class Minimax extends PuissanceXDecider {
 
         for (int i = WIN_CONDITION; i > 1; i--) {
             if (board.checkWin(row, col, i)) {
-                score += ((float) Math.pow(3, i));
+                score += ((float) Math.pow(3, i)) ;
             }
         }
 
@@ -131,34 +126,27 @@ public class Minimax extends PuissanceXDecider {
     }
 
     public float evaluate(int id) {
-        float center = ((float) this.board.getNbCols()) / 2;
+        float center = ((float) this.board.getNbCols()) / 2.0f - 0.5f;
 
 
         float score = 0;
 
         for (int col = 0; col < this.board.getNbCols(); col++) {
-            float note = (0.5f - (Math.abs(center - col) / center)) * 5; // center disk are better
+            float colWeight = (1.0f - Math.abs(center - col) / center) * 31.0f; // center disk are better
 
             for (int row = 0; row < this.board.getNbRows(); row++) {
                 if (board.get(row, col) == -1) {
                     continue;
                 }
                 if (board.get(row, col) == id) {
-                    if (board.checkWin(row, col, WIN_CONDITION)) {
-                        return WIN_SCORE - board.getNbDisk();
-                    }
-                    score += note;
+                    score += colWeight;
                     score += this.evaluateAlign(row, col);
                 } else {
-                    if (board.checkWin(row, col, WIN_CONDITION)) {
-                        return -(WIN_SCORE - board.getNbDisk());
-                    }
-                    score -= note;
+                    score -= colWeight;
                     score -= this.evaluateAlign(row, col);
                 }
             }
         }
-
         return score;
     }
 }
