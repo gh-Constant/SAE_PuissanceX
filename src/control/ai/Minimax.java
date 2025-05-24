@@ -13,8 +13,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Minimax extends PuissanceXDecider {
+    private static long TOTAL_TIME = 0;
+    private static long TOTAL_COUNT_OPERATION = 0;
+
+
     public static final float WIN_SCORE = 100_000_000;
-    public static final int DEFAULT_DEPTH = 12;
+    public static final int DEFAULT_DEPTH = 14;
 
     private int WIN_CONDITION = 4;
     private int COUNT_OPERATIONS = 0;
@@ -46,14 +50,7 @@ public class Minimax extends PuissanceXDecider {
         final int id = model.getIdPlayer();
         float[] scores = new float[board.getNbCols()];
 
-        calculateSearchOrder(findLastMove(oldBoard));
-        List<Integer> alreadySearched = new ArrayList<>();
         for (int c : DEFAULT_SEARCH_ORDER) {
-            if (c == -1 || alreadySearched.contains(c)) {
-                continue;
-            }
-            alreadySearched.add(c);
-
             if (board.isColumnFull(c)) {
                 continue;
             }
@@ -75,8 +72,12 @@ public class Minimax extends PuissanceXDecider {
         }
         System.out.println();
 
+        TOTAL_TIME += endTime - startTime;
+        TOTAL_COUNT_OPERATION += COUNT_OPERATIONS;
+
         Logger.info("AI player " + id + " selected column: " + col + " with score: " + scores[col]);
         Logger.info(COUNT_OPERATIONS + " operations en " + (endTime - startTime) / 1_000_000 + " ms");
+        Logger.info("Total : " + TOTAL_COUNT_OPERATION + " operations en " + TOTAL_TIME / 1_000_000 + " ms");
 
         return this.getActions(col);
     }
@@ -100,14 +101,7 @@ public class Minimax extends PuissanceXDecider {
 
         float score = -(WIN_SCORE - board.getNbDisk());
 
-        calculateSearchOrder(col);
-        List<Integer> alreadySearched = new ArrayList<Integer>();
         for (int c : DEFAULT_SEARCH_ORDER) {
-            if (c == -1 || alreadySearched.contains(c)) {
-                continue;
-            }
-            alreadySearched.add(c);
-
             if (board.isColumnFull(c)) {
                 continue;
             }
@@ -127,45 +121,11 @@ public class Minimax extends PuissanceXDecider {
         return score;
     }
 
-    private int findLastMove(SimplifyBoard oldBoard) {
-        if (oldBoard == null || this.board.getNbDisk() != oldBoard.getNbDisk() + 1) {
-            return -1;
-        }
-        List<Integer> diff = this.board.getDiffs(oldBoard);
-
-        for (int i = 0; i < board.getNbCols(); i++) {
-            if (diff.get(i) != 0) {
-                return i;
-            }
-        }
-        return -1;
-    }
-
-    private void calculateSearchOrder(int lastMove) {
-        DEFAULT_SEARCH_ORDER.set(0, lastMove);
-        DEFAULT_SEARCH_ORDER.set(1, lastMove);
-        DEFAULT_SEARCH_ORDER.set(2, lastMove);
-        if (lastMove == -1) {
-            return;
-        }
-
-        if (lastMove - 1 > 0) {
-            DEFAULT_SEARCH_ORDER.set(1, lastMove - 1);
-        }
-        if (lastMove + 1 < board.getNbCols()) {
-            DEFAULT_SEARCH_ORDER.set(2, lastMove + 1);
-        }
-    }
-
     private void calculateDefaultSearchOrder() {
         DEFAULT_SEARCH_ORDER = new ArrayList<>();
 
         int nbCols = this.board.getNbCols();
         int center = nbCols / 2;
-
-        DEFAULT_SEARCH_ORDER.add(-1);
-        DEFAULT_SEARCH_ORDER.add(-1);
-        DEFAULT_SEARCH_ORDER.add(-1);
 
         DEFAULT_SEARCH_ORDER.add(center);
         if (nbCols % 2 != 0) {
