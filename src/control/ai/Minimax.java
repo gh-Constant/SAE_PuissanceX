@@ -18,7 +18,7 @@ public class Minimax extends PuissanceXDecider {
 
 
     public static final float WIN_SCORE = 100_000_000;
-    public static final int DEFAULT_DEPTH = 14;
+    public static final int DEFAULT_DEPTH = 10;
 
     private int WIN_CONDITION = 4;
     private int COUNT_OPERATIONS = 0;
