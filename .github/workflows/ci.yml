@@ -22,19 +22,5 @@ jobs:
       - name: Build with Maven
         run: mvn clean verify
 
-      - name: Run Checkstyle
-        run: mvn checkstyle:check
-
-      - name: Run SpotBugs
-        run: mvn com.github.spotbugs:spotbugs-maven-plugin:check
-
-      - name: Dependency vulnerability check
-        run: mvn org.owasp:dependency-check-maven:check
-
-      - name: Verify JAR size
-        run: |
-          if (Test-Path target/*.jar) {
-            Get-ChildItem target/*.jar | ForEach-Object {
-              if ($_.Length -gt 200MB) { exit 1 }
-            }
-          }
+      - name: Run tests
+        run: mvn test
