@@ -1,50 +1,50 @@
-# 🎯 PuissanceX
+# PuissanceX
 
 **PuissanceX** est une version moderne et évolutive du célèbre jeu **Puissance 4**, développée en Java avec une architecture **MVC** propre et propulsée par le framework **Boardifier**.
 Le jeu est jouable en **console** et est conçu pour accueillir une future interface **graphique JavaFX**.
 
 ---
 
-## 🚀 Fonctionnalités
+## Fonctionnalités
 
-* 🎮 **Modes de jeu variés** :
+* **Modes de jeu variés** :
 
   * Humain vs Humain
   * Humain vs IA (Minimax ou Deep Learning)
   * IA vs IA
 
-* 🧹 **Paramétrage avancé** :
+* **Paramétrage avancé** :
 
   * Nombre de **lignes**, **colonnes**
   * Condition de **victoire**
   * Mode de jeu
   * **Niveau de difficulté** de l'IA
 
-* 🤖 **Intelligence Artificielle intégrée** :
+* **Intelligence Artificielle intégrée** :
 
   * Algorithme **Minimax** avec heuristiques personnalisées
   * Intégration à venir de **Deep Learning** via **Deeplearning4j**
 
-* 🧱 **Architecture modulaire (MVC)** :
+* **Architecture modulaire (MVC)** :
 
   * Séparation claire entre **modèle**, **vue** et **contrôleur**
   * Extensible pour de futures variantes ou interfaces
 
-* ✅ **Tests unitaires** :
+* **Tests unitaires** :
 
   * Couverture des composants critiques avec **JUnit 5**
 
 ---
 
-## 💠 Prérequis
+## Prérequis
 
 * **Java 17** ou supérieur
 * **Maven 3.6+**
-* (Optionnel) Un IDE Java (🔧 **IntelliJ IDEA recommandé**)
+* (Optionnel) Un IDE Java (**IntelliJ IDEA recommandé**)
 
 ---
 
-## 📦 Installation
+## Installation
 
 ```bash
 git clone https://github.com/votre-utilisateur/puissancex.git
@@ -54,9 +54,9 @@ mvn clean install
 
 ---
 
-## ▶️ Lancement du jeu
+## Lancement du jeu
 
-### 🔹 Depuis la console
+### Depuis la console
 
 ```bash
 mvn exec:java
@@ -77,14 +77,14 @@ mvn exec:java -Dexec.args="4 6 7 1"
   * `1` : Humain vs IA
   * `2` : IA vs IA
 
-### 🔹 Depuis un IDE
+### Depuis un IDE
 
 1. Ouvrez le projet dans **IntelliJ IDEA**
 2. Lancez la classe **`PuissanceXConsole`** comme classe principale
 
 ---
 
-## 🧱 Structure du projet
+## Structure du projet
 
 ```
 src/
@@ -100,13 +100,13 @@ src/
 
 ---
 
-## 🔧 Technologies utilisées
+## Technologies utilisées
 
-* ☕ Java 17
-* 🧰 Maven
-* 🧌 Boardifier (framework MVC)
-* 🎨 JavaFX (à venir)
-* 🧠 Deeplearning4j (IA avancée, à venir)
-* 🧪 JUnit 5
+* Java 17
+* Maven
+* Boardifier (framework MVC)
+* JavaFX (à venir)
+* Deeplearning4j (IA avancée, à venir)
+* JUnit 5
 
 ---
