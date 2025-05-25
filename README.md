@@ -42,20 +42,6 @@ Le jeu est jouable en **console** et est conçu pour accueillir une future inter
 * **Maven 3.6+**
 * (Optionnel) Un IDE Java (🔧 **IntelliJ IDEA recommandé**)
 
-  - [ ] Develop board evaluation heuristics
-    ```java
-    private int evaluateBoard(Board board) {
-        int score = 0;
-        
-        // Evaluate center control (center columns are more valuable)
-        // Evaluate connected pieces (2-in-a-row, 3-in-a-row)
-        // Evaluate blocking opponent's potential wins
-        // Evaluate winning positions
-        
-        return score;
-    }
-    ```
-
 ---
 
 ## ▶️ Lancement du jeu
@@ -67,63 +53,6 @@ mvn exec:java
 ```
 
 Avec des **paramètres personnalisés** :
-
-- [ ] **Train neural network model**
-  - [ ] Set up training pipeline
-  - [ ] Implement supervised learning from MinMax data
-  - [ ] Add reinforcement learning through self-play
-  - [ ] Tune hyperparameters for optimal performance
-
-- [ ] **Create DeepLearningPlayer class**
-  - [ ] Implement model loading and inference
-    ```java
-    public DeepLearningPlayer(int playerId) {
-        this.playerId = playerId;
-        this.model = loadModel("model/puissancex_nn.model");
-        this.guide = new MinMaxPlayer(playerId, 3); // Fallback
-    }
-    
-    public int selectMove(Board board) {
-        // Convert board to input format
-        float[] input = boardToInput(board);
-        
-        // Run inference
-        float[] predictions = model.predict(input);
-        
-        // Select best valid move
-        int bestCol = -1;
-        float bestScore = Float.NEGATIVE_INFINITY;
-        
-        for (int col = 0; col < board.getNbCols(); col++) {
-            if (!board.isColumnFull(col) && predictions[col] > bestScore) {
-                bestScore = predictions[col];
-                bestCol = col;
-            }
-        }
-        
-        // Fallback to MinMax if needed
-        if (bestCol == -1) {
-            bestCol = guide.findBestMove(board);
-        }
-        
-        return bestCol;
-    }
-    ```
-
-  - [ ] Add hybrid decision making (combining NN and MinMax)
-  - [ ] Implement confidence thresholds for model predictions
-
-### 4. JavaFX GUI Implementation
-- [ ] **Create JavaFX-specific look classes**
-  - [ ] Implement JavaFX BoardLook with proper styling
-  - [ ] Design animated DiskLook with JavaFX shapes
-  - [ ] Create game information panel with JavaFX controls
-
-- [ ] **Add animations and effects**
-  - [ ] Implement puissanceXDisk dropping animation
-  - [ ] Add highlighting for winning combinations
-  - [ ] Create transition effects between turns
-  - [ ] Add sound effects for moves and game events
 
 ---
 
