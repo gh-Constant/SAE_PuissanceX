@@ -164,7 +164,7 @@ Module configuration via PuissanceX.iml
 Standard project structure with src directory for source code
 Integrated Java development support
 Development Tools
-Git: Used for version main.control
+Git: Used for version control
 IntelliJ IDEA: Integrated Development Environment
 Full Java development support
 Integrated debugging tools
