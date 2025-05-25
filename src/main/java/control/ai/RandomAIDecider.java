@@ -36,31 +36,15 @@ public class RandomAIDecider extends PuissanceXDecider {
         PuissanceXBoard board = stageModel.getBoard();
 
         // Find all columns that are not full
-        List<Integer> availableCols = new ArrayList<>();
-        for (int col = 0; col < board.getNbCols(); col++) {
-            if (!board.isColumnFull(col)) {
-                availableCols.add(col);
-            }
-        }
+        List<Integer> availableCols = board.getAvailableCol();
 
-        if (availableCols.isEmpty()) {
+        if (board.isFull()) {
             return null; // No valid moves
         }
 
         // Pick a random column
         int chosenCol = availableCols.get(random.nextInt(availableCols.size()));
-        int row = board.getFirstEmptyRow(chosenCol);
 
-        // Create a new disk for the current player
-        int currentPlayer = model.getIdPlayer();
-        PuissanceXDisk puissanceXDisk = new PuissanceXDisk(currentPlayer, stageModel);
-
-        // Create the action to put the disk in the chosen column
-        ActionList actions = ActionFactory.generatePutInContainer(model, puissanceXDisk, "board", row, chosenCol);
-        actions.setDoEndOfTurn(true);
-        
-        System.out.println("AI player " + (currentPlayer + 1) + " chooses column " + chosenCol);
-        
-        return actions;
+        return this.getActions(chosenCol);
     }
 }

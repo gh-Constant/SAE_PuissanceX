@@ -1,7 +1,11 @@
+import java.util.concurrent.locks.Condition;
+
 import boardifier.control.Logger;
 import boardifier.control.StageFactory;
 import boardifier.view.View;
 import control.PuissanceXController;
+import control.ai.Minimax;
+import control.ai.RandomAIDecider;
 import control.ai.ConditionAI;
 import model.PuissanceXModel;
 import view.PuissanceXMenu;
@@ -77,7 +81,7 @@ public class PuissanceXConsole {
             Logger.info("  Game mode: " + currentGameMode);
         }
 
-        // Initialize main.model with parameters
+        // Initialize model with parameters
         PuissanceXModel model = new PuissanceXModel();
         model.setWinCondition(winCondition);
         model.setBoardRows(boardRows);
@@ -98,24 +102,25 @@ public class PuissanceXConsole {
             Logger.debug("Added computer1 (AI) and computer2 (AI).");
         }
 
-        Logger.info("Registering PuissanceX main.model and main.view with StageFactory.");
+        Logger.info("Registering PuissanceX model and view with StageFactory.");
         StageFactory.registerModelAndView("puissanceX", "model.PuissanceXStageModel", "view.PuissanceXStageView");
         
         View gameView = new View(model); 
-        Logger.debug("View object (boardifier.main.view.View) created.");
+        Logger.debug("View object (boardifier.view.View) created.");
 
         PuissanceXController control = new PuissanceXController(model, gameView);
         Logger.debug("PuissanceXController object created.");
         
         // Set up AI decider if needed
         if (currentGameMode == 1 || currentGameMode == 2) {
-            ConditionAI aiDecider = new ConditionAI(model, control);
+            Minimax aiDecider = new Minimax(model, control);
             control.setAIDecider(aiDecider);
             Logger.debug("MinimaxAI created and set for AI players.");
         }
         
         control.setFirstStageName("puissanceX");
         Logger.debug("First stage name set to 'puissanceX'.");
+        
 
         try {
             Logger.info("Attempting to start game...");

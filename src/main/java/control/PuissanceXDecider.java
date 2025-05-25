@@ -1,6 +1,8 @@
 package control;
 
+import boardifier.control.ActionFactory;
 import boardifier.control.Decider;
+import boardifier.model.GameElement;
 import boardifier.model.Model;
 import boardifier.control.ActionFactory;
 import boardifier.control.Controller;
@@ -9,6 +11,10 @@ import model.PuissanceXDisk;
 import model.PuissanceXModel;
 import model.PuissanceXStageModel;
 import boardifier.model.action.ActionList;
+import model.PuissanceXStageModel;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class PuissanceXDecider extends Decider {
     public PuissanceXDecider(Model model, Controller control) {
@@ -21,7 +27,6 @@ public class PuissanceXDecider extends Decider {
         // TODO: Implement decision logic
         return null;
     }
-
 
     public ActionList getActions(int column) {
         PuissanceXStageModel stageModel = (PuissanceXStageModel) model.getGameStage();
@@ -41,5 +46,4 @@ public class PuissanceXDecider extends Decider {
 
         return actions;
     }
-    
 }
