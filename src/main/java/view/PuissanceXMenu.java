@@ -14,6 +14,8 @@ public class PuissanceXMenu {
     private int boardCols = 7;
     private int gameMode = 1;
     private boolean exitRequested = false;
+    private int aiType1 = 0;
+    private int aiType2 = 0;
 
     public PuissanceXMenu() {
         scanner = new Scanner(System.in);
@@ -54,9 +56,11 @@ public class PuissanceXMenu {
         System.out.println("║          PUISSANCE X GAME          ║");
         System.out.println("╠════════════════════════════════════╣");
         System.out.println("║ Current Settings:                  ║");
-        System.out.println("║ • Game Mode: " + getGameModeString() + "              ║");
+        System.out.println("║ • Game Mode: " + getGameModeString() + "     ║");
+        System.out.println("║ • AI Type 1: " + (aiType1 == 0 ? "Minimax" : aiType1 == 1 ? "Random" : "Condition") + "               ║");
+        System.out.println("║ • AI Type 2: " + (aiType2 == 0 ? "Minimax" : aiType2 == 1 ? "Random" : "Condition") + "               ║");
         System.out.println("║ • Board Size: " + boardRows + "x" + boardCols + "                  ║");
-        System.out.println("║ • Win Condition: " + winCondition + "                  ║");
+        System.out.println("║ • Win Condition: " + winCondition + "                 ║");
         System.out.println("║ • Column Input: 1-" + boardCols + "                ║");
         System.out.println("╠════════════════════════════════════╣");
         System.out.println("║ 1. Start Game                      ║");
@@ -78,6 +82,16 @@ public class PuissanceXMenu {
         System.out.println("╚════════════════════════════════════╝");
         
         gameMode = getIntInput("Enter game mode (0-2): ", 0, 2);
+        
+        if (gameMode == 1) {
+            selectAI(true);
+        } else if (gameMode == 2) {
+            System.out.println("\nSelect first AI:");
+            selectAI(true);
+            System.out.println("\nSelect second AI:");
+            selectAI(false);
+        }
+        
         Logger.debug("Game mode set to: " + gameMode);
     }
 
@@ -154,5 +168,31 @@ public class PuissanceXMenu {
 
     public int getGameMode() {
         return gameMode;
+    }
+
+    public int getAIType1() {
+        return aiType1;
+    }
+
+    public int getAIType2() {
+        return aiType2;
+    }
+
+    private void selectAI(boolean isFirstAI) {
+        clearScreen();
+        System.out.println("╔════════════════════════════════════╗");
+        System.out.println("║          SELECT AI TYPE            ║");
+        System.out.println("╠════════════════════════════════════╣");
+        System.out.println("║ 0. Minimax AI                      ║");
+        System.out.println("║ 1. Random AI                       ║");
+        System.out.println("║ 2. Condition AI                    ║");
+        System.out.println("╚════════════════════════════════════╝");
+        
+        int selection = getIntInput("Enter AI type (0-2): ", 0, 2);
+        if (isFirstAI) {
+            aiType1 = selection;
+        } else {
+            aiType2 = selection;
+        }
     }
 }

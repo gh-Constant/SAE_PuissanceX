@@ -23,6 +23,7 @@ public class PuissanceXController extends Controller {
 
     private Scanner scanner;
     private Decider aiDecider;
+    private Decider secondAiDecider;
 
     /**
      * Constructor for the PuissanceX controller.
@@ -31,10 +32,15 @@ public class PuissanceXController extends Controller {
         super(model, view);
         this.scanner = new Scanner(System.in);
         this.aiDecider = null;
+        this.secondAiDecider = null;
     }
     
     public void setAIDecider(Decider decider) {
         this.aiDecider = decider;
+    }
+
+    public void setSecondAIDecider(Decider decider) {
+        this.secondAiDecider = decider;
     }
 
     /**
@@ -85,15 +91,19 @@ public class PuissanceXController extends Controller {
         if (player.getType() == Player.COMPUTER) {
             System.out.println("AI is thinking...");
             
-            // Use the AI decider to make a move
-            if (aiDecider != null) {
-                ActionList actions = aiDecider.decide();
+            // Use the appropriate AI decider based on the current player
+            Decider currentDecider;
+            if (currentPlayer == 0) {
+                currentDecider = aiDecider;
+            } else {
+                currentDecider = secondAiDecider;
+            }
+            
+            if (currentDecider != null) {
+                ActionList actions = currentDecider.decide();
                 if (actions != null) {
-                    // Play the action
                     ActionPlayer actionPlayer = new ActionPlayer(model, this, actions);
                     actionPlayer.start();
-                    
-                    // Check for win after AI move
                     checkGameEndConditions(board);
                 } else {
                     System.out.println("AI couldn't make a valid move!");
