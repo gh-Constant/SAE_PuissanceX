@@ -14,6 +14,8 @@ public class PuissanceXMenu {
     private int boardCols = 7;
     private int gameMode = 1;
     private boolean exitRequested = false;
+    private int aiType1 = 0;
+    private int aiType2 = 0;
 
     public PuissanceXMenu() {
         scanner = new Scanner(System.in);
@@ -54,10 +56,14 @@ public class PuissanceXMenu {
         System.out.println("║          PUISSANCE X GAME          ║");
         System.out.println("╠════════════════════════════════════╣");
         System.out.println("║ Current Settings:                  ║");
-        System.out.println("║ • Game Mode: " + getGameModeString() + "              ║");
-        System.out.println("║ • Board Size: " + boardRows + "x" + boardCols + "                  ║");
-        System.out.println("║ • Win Condition: " + winCondition + "                  ║");
-        System.out.println("║ • Column Input: 1-" + boardCols + "                ║");
+        System.out.println(String.format("║ • Game Mode: %-22s║", getGameModeString()));
+        String aiType1Str = (aiType1 == 1 ? "Minimax" : aiType1 == 2 ? "Random" : aiType1 == 3 ? "Condition" : "None");
+        System.out.println(String.format("║ • AI Type 1: %-22s║", aiType1Str));
+        String aiType2Str = (aiType2 == 1 ? "Minimax" : aiType2 == 2 ? "Random" : aiType2 == 3 ? "Condition" : "None");
+        System.out.println(String.format("║ • AI Type 2: %-22s║", aiType2Str));
+        System.out.println(String.format("║ • Board Size: %-21s║", boardRows + "x" + boardCols));
+        System.out.println(String.format("║ • Win Condition: %-18s║", winCondition));
+        System.out.println(String.format("║ • Column Input: 1-%-17s║", boardCols));
         System.out.println("╠════════════════════════════════════╣");
         System.out.println("║ 1. Start Game                      ║");
         System.out.println("║ 2. Change Game Mode                ║");
@@ -72,12 +78,22 @@ public class PuissanceXMenu {
         System.out.println("╔════════════════════════════════════╗");
         System.out.println("║          SELECT GAME MODE          ║");
         System.out.println("╠════════════════════════════════════╣");
-        System.out.println("║ 0. Human vs Human                  ║");
-        System.out.println("║ 1. Human vs Computer               ║");
-        System.out.println("║ 2. Computer vs Computer            ║");
+        System.out.println("║ 1. Human vs Human                  ║");
+        System.out.println("║ 2. Human vs Computer               ║");
+        System.out.println("║ 3. Computer vs Computer            ║");
         System.out.println("╚════════════════════════════════════╝");
+
+        gameMode = getIntInput("Enter game mode (1-3): ", 1, 3);
+
+        if (gameMode == 2) {
+            selectAI(true);
+        } else if (gameMode == 3) {
+            System.out.println("\nSelect first AI:");
+            selectAI(true);
+            System.out.println("\nSelect second AI:");
+            selectAI(false);
+        }
         
-        gameMode = getIntInput("Enter game mode (0-2): ", 0, 2);
         Logger.debug("Game mode set to: " + gameMode);
     }
 
@@ -86,11 +102,11 @@ public class PuissanceXMenu {
         System.out.println("╔════════════════════════════════════╗");
         System.out.println("║          SET BOARD SIZE            ║");
         System.out.println("╠════════════════════════════════════╣");
-        System.out.println("║ Current size: " + boardRows + "x" + boardCols + "                  ║");
+        System.out.println(String.format("║ Current size: %-21s ║", boardRows + "x" + boardCols));
         System.out.println("╚════════════════════════════════════╝");
-        
-        boardRows = getIntInput("Enter number of rows (4-10): ", 4, 10);
-        boardCols = getIntInput("Enter number of columns (4-10): ", 4, 10);
+
+        boardRows = getIntInput("Enter number of rows (between 4-10): ", 4, 10);
+        boardCols = getIntInput("Enter number of columns (between 4-10): ", 4, 10);
         Logger.debug("Board size set to: " + boardRows + "x" + boardCols);
     }
 
@@ -99,7 +115,7 @@ public class PuissanceXMenu {
         System.out.println("╔════════════════════════════════════╗");
         System.out.println("║         SET WIN CONDITION          ║");
         System.out.println("╠════════════════════════════════════╣");
-        System.out.println("║ Current win condition: " + winCondition + "           ║");
+        System.out.println(String.format("║ Current win condition: %-12s ║", winCondition));
         System.out.println("╚════════════════════════════════════╝");
         
         int maxWin = Math.min(boardRows, boardCols);
@@ -109,9 +125,9 @@ public class PuissanceXMenu {
 
     private String getGameModeString() {
         switch (gameMode) {
-            case 0: return "Human vs Human";
-            case 1: return "Human vs Computer";
-            case 2: return "Computer vs Computer";
+            case 1: return "Human vs Human";
+            case 2: return "Human vs Computer";
+            case 3: return "Computer vs Computer";
             default: return "Unknown";
         }
     }
@@ -154,5 +170,75 @@ public class PuissanceXMenu {
 
     public int getGameMode() {
         return gameMode;
+    }
+
+    public int getAIType1() {
+        return aiType1;
+    }
+
+    public int getAIType2() {
+        return aiType2;
+    }
+
+    private void selectAI(boolean isFirstAI) {
+        clearScreen();
+        System.out.println("╔════════════════════════════════════╗");
+        System.out.println("║          SELECT AI TYPE            ║");
+        System.out.println("╠════════════════════════════════════╣");
+        System.out.println("║ 1. Minimax AI                      ║");
+        System.out.println("║ 2. Random AI                       ║");
+        System.out.println("║ 3. Condition AI                    ║");
+        System.out.println("╚════════════════════════════════════╝");
+
+        int selection = getIntInput("Enter AI type (1-3): ", 1, 3);
+        if (isFirstAI) {
+            aiType1 = selection;
+        } else {
+            aiType2 = selection;
+        }
+    }
+
+    /**
+     * Affiche le menu de fin de partie avec les options rejouer ou quitter.
+     * @return true si le joueur veut rejouer, false s'il veut quitter
+     */
+    public boolean showEndGameMenu() {
+        clearScreen();
+        System.out.println("╔════════════════════════════════════╗");
+        System.out.println("║            PARTIE TERMINÉE         ║");
+        System.out.println("╠════════════════════════════════════╣");
+        System.out.println("║ 1. Rejouer                         ║");
+        System.out.println("║ 2. Retour au menu principal        ║");
+        System.out.println("║ 3. Quitter                         ║");
+        System.out.println("╚════════════════════════════════════╝");
+
+        int choice = getIntInput("Entrez votre choix: ", 1, 3);
+        
+        switch (choice) {
+            case 1: // Rejouer
+                return true;
+            case 2: // Retour au menu principal
+                return false;
+            case 3: // Quitter
+                exitRequested = true;
+                return false;
+            default:
+                return false;
+        }
+    }
+
+    /**
+     * Réinitialise l'état du menu pour permettre de revenir au menu principal.
+     */
+    public void resetExitRequest() {
+        exitRequested = false;
+    }
+
+    /**
+     * Vérifie si l'utilisateur a demandé à quitter.
+     * @return true si l'utilisateur veut quitter
+     */
+    public boolean isExitRequested() {
+        return exitRequested;
     }
 }
