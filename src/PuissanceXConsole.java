@@ -4,6 +4,7 @@ import boardifier.control.Logger;
 import boardifier.control.StageFactory;
 import boardifier.view.View;
 import control.PuissanceXController;
+import control.ai.Minimax;
 import control.ai.RandomAIDecider;
 import control.ai.ConditionAI;
 import model.PuissanceXModel;
@@ -112,13 +113,14 @@ public class PuissanceXConsole {
         
         // Set up AI decider if needed
         if (currentGameMode == 1 || currentGameMode == 2) {
-            ConditionAI aiDecider = new ConditionAI(model, control);
+            Minimax aiDecider = new Minimax(model, control);
             control.setAIDecider(aiDecider);
             Logger.debug("MinimaxAI created and set for AI players.");
         }
         
         control.setFirstStageName("puissanceX");
         Logger.debug("First stage name set to 'puissanceX'.");
+        
 
         try {
             Logger.info("Attempting to start game...");
