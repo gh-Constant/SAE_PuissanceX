@@ -6,7 +6,7 @@ This section explains how to make changes to the User Interface, focusing on the
 
 Let's say you want to modify the board display so that letters (A, B, C, ...) are used for rows (down the side) and numbers (1, 2, 3, ...) are used for columns (across the top), the opposite of the current setup.
 
-**File to Modify:** `src/boardifier/view/ClassicBoardLook.java`
+**File to Modify:** `src/boardifier/main.view/ClassicBoardLook.java`
 
 The method responsible for drawing the row and column coordinates is `renderCoords()` in this file.
 
