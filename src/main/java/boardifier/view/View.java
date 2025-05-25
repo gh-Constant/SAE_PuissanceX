@@ -7,7 +7,7 @@ import boardifier.model.Model;
 public class View {
 
     /**
-     * The model
+     * The main.model
      */
     protected Model model;
 

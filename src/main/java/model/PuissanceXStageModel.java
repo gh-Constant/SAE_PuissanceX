@@ -12,7 +12,7 @@ public class PuissanceXStageModel extends GameStageModel {
     
     public PuissanceXStageModel(String name, Model model) {
         super(name, model);
-        // Get win condition from the model if it's a PuissanceXModel
+        // Get win condition from the main.model if it's a PuissanceXModel
         if (model instanceof PuissanceXModel) {
             this.winCondition = ((PuissanceXModel) model).getWinCondition();
         } else {

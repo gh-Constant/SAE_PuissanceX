@@ -1,8 +1,5 @@
 package boardifier.model;
 
-import boardifier.control.Logger;
-import boardifier.view.ElementLook;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -191,7 +188,7 @@ public class ContainerElement extends StaticElement {
         return false;
     }
 
-    // reset the board by removing elements from the board AND from the elements in model
+    // reset the board by removing elements from the board AND from the elements in main.model
     public void reset() {
         for (int i = 0; i < nbRows; i++) {
             for (int j = 0; j < nbCols; j++) {
@@ -214,7 +211,7 @@ public class ContainerElement extends StaticElement {
 
         // signal that element has changed of grid => the inner layout has to take ownership of the element look, which is initiated by the controller
         element.addPutInContainerEvent(this, row, col);
-        // signal the stage model that element is put in grid so that callback can be exectued
+        // signal the stage main.model that element is put in grid so that callback can be exectued
         gameStageModel.putInContainer(element, this, row, col);
     }
 
@@ -240,7 +237,7 @@ public class ContainerElement extends StaticElement {
 
         // signal that element has changed of grid => the inner layout has to take ownership of the element look, which is initiated by the controller
         element.addRemoveFromContainerEvent(this, row, col);
-        // signal the stage model that element is removed from grid so that callback can be executed
+        // signal the stage main.model that element is removed from grid so that callback can be executed
         gameStageModel.removedFromContainer(element, this, row, col);
     }
 
@@ -286,7 +283,7 @@ public class ContainerElement extends StaticElement {
             grid[rd][cd].add(element);
 
             element.addMoveInContainerEvent(rs,cs,rd,cd);
-            // signal the stage model that element is moved within the same grid so that callback can be exectued
+            // signal the stage main.model that element is moved within the same grid so that callback can be exectued
             gameStageModel.movedInContainer(element, this, rd, cd);
         }
     }

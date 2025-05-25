@@ -1,6 +1,5 @@
 package boardifier.view;
 
-import boardifier.control.Logger;
 import boardifier.model.Coord2D;
 import boardifier.model.GameElement;
 
@@ -47,7 +46,7 @@ public class RootPane {
 
     public void udpate() {
         /*
-        // first update the game stage view if it exists
+        // first update the game stage main.view if it exists
         if (gameStageView != null) {
             gameStageView.update();
         }
@@ -55,7 +54,7 @@ public class RootPane {
          */
         // then create the viewport
 
-        // first, determine the size of the view
+        // first, determine the size of the main.view
         int w = 0;
         int h = 0;
 

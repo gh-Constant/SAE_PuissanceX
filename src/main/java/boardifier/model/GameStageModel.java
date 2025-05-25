@@ -7,12 +7,12 @@ public abstract class GameStageModel {
     
     /**
      * The local state of the stage.
-     * This state is different from the global state that is defined in model.
+     * This state is different from the global state that is defined in main.model.
      */
     protected int state; // the local state of the stage.
     /**
-     * The parent model.
-     * Obviously, the model must be instantiated BEFORE the game stage.
+     * The parent main.model.
+     * Obviously, the main.model must be instantiated BEFORE the game stage.
      */
     protected Model model;
 
@@ -180,7 +180,7 @@ public abstract class GameStageModel {
         onRemoveFromContainerCallback.execute(element, container, row, col);
     }
 
-    // by default removing = hide the element and move it outside the current scope of the view
+    // by default removing = hide the element and move it outside the current scope of the main.view
     public void removeElement(GameElement element) {
         element.setLocation(-10000,-10000);
         element.setVisible(false);

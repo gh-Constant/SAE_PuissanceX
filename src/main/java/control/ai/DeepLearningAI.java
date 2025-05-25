@@ -12,8 +12,7 @@ public class DeepLearningAI extends PuissanceXDecider {
 
     @Override
     public ActionList decide() {
-        // Implement random move logic here
-        // Return an ActionList representing the chosen move
+        // Sorry but the deep learning logic is not implemented yet. :(
         return super.decide(); // Placeholder
     }
 }

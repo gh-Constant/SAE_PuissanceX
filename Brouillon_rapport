@@ -11,11 +11,11 @@ Framework overview (boardifier-console)
 
 2. Architecture and Implementation (4-5 pages)
 2.1 MVC Architecture Overview
-Based on: src/model/, src/view/, src/control/
+Based on: src/main.model/, src/main.view/, src/main.control/
 Framework integration
 Component interaction
 2.2 Model Implementation
-Based on: src/model/
+Based on: src/main.model/
 Key classes:
 PuissanceXModel
 PuissanceXStageModel
@@ -24,12 +24,12 @@ PuissanceXDisk
 State management
 Game logic implementation
 2.3 View Implementation
-Based on: src/view/
+Based on: src/main.view/
 Console display design
 Board visualization
 Player interface
 2.4 Controller Implementation
-Based on: src/control/
+Based on: src/main.control/
 Game flow management
 Input handling
 Player turn management
@@ -37,7 +37,7 @@ Player turn management
 
 3. AI Strategies (3-4 pages)
 3.1 Strategy Overview
-Based on: src/control/ai/
+Based on: src/main.control/ai/
 Strategy selection mechanism
 Implementation approach
 3.2 Strategy 1: [Name of first strategy]
@@ -86,7 +86,7 @@ Stability assessment
 
 5. User Interface and Game Flow (2-3 pages)
 5.1 Console Interface
-Based on: src/view/
+Based on: src/main.view/
 Board display
 Player interaction
 Game state visualization
@@ -142,7 +142,7 @@ Project Structure
 The project follows a well-defined MVC (Model-View-Controller) architecture:
 Model: Manages game logic and state
 View: Handles display of game elements
-Controller: Coordinates interactions between model and view
+Controller: Coordinates interactions between main.model and main.view
 Game Objectives
 PuissanceX implements the classic Connect-4 rules:
 Two players compete on a 6x7 grid
