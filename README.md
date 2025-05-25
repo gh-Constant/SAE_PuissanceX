@@ -110,17 +110,3 @@ src/
 * 🧪 JUnit 5
 
 ---
-
-## 🤝 Contribution
-
-Les contributions sont les bienvenues ! 💡
-
-1. Forkez le projet
-2. Créez une branche dédiée (`feature/ma-feature`)
-3. Proposez une **Pull Request**
-
----
-
-## 📜 Licence
-
-Projet open-source sous licence **MIT** *(ou autre à préciser si besoin)*.
