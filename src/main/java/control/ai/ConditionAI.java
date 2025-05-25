@@ -142,6 +142,7 @@ public class ConditionAI extends PuissanceXDecider {
             simpBoard.suppr(col);
             return actions;
         }
+        simpBoard.suppr(col);
         return null;
     }
 
@@ -159,7 +160,7 @@ public class ConditionAI extends PuissanceXDecider {
             simpBoard.suppr(col);
             return actions;
         }
-
+        simpBoard.suppr(col);
         return null;
     }
 
