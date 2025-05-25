@@ -26,7 +26,7 @@ public class SimplifyBoard {
                 if (elt.isEmpty()) {
                     this.board[row][col] = -1;
                 } else {
-                    this.board[row][col] = ((PuissanceXDisk) elt.getFirst()).getPlayerId();
+                    this.board[row][col] = ((PuissanceXDisk) elt.get(0)).getPlayerId();
                     this.nbDisk++;
                 }
             }

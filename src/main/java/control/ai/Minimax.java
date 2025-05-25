@@ -93,7 +93,7 @@ public class Minimax extends PuissanceXDecider {
         float score = -(WIN_SCORE - board.getNbDisk());
 
         for (int c : DEFAULT_SEARCH_ORDER) {
-            if (board.isColumnFull(c)) {
+            if (c == -1 || board.isColumnFull(c)) {
                 continue;
             }
 
@@ -126,7 +126,7 @@ public class Minimax extends PuissanceXDecider {
             }
         } else {
             DEFAULT_SEARCH_ORDER.add(center - 1);
-            for (int i = 1; i <= center; i++) {
+            for (int i = 1; i < center; i++) {
                 DEFAULT_SEARCH_ORDER.add(center - 1 - i);
                 DEFAULT_SEARCH_ORDER.add(center + i);
             }
