@@ -2,7 +2,6 @@ package view;
 
 import boardifier.model.GameStageModel;
 import boardifier.model.TextElement;
-import boardifier.view.ElementLook;
 import boardifier.view.GameStageView;
 import boardifier.view.TextLook;
 import model.PuissanceXBoard;

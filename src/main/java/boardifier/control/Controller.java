@@ -46,11 +46,11 @@ public abstract class Controller {
     protected void startStage(String stageName) throws GameException {
         if (model.isStageStarted()) stopStage();
         Logger.trace("START STAGE " + stageName);
-        // create the model of the stage by using the StageFactory
+        // create the main.model of the stage by using the StageFactory
         GameStageModel gameStageModel = StageFactory.createStageModel(stageName, model);
         // create the elements of the stage by getting the default factory of this stage and giving it to createElements()
         gameStageModel.createElements(gameStageModel.getDefaultElementFactory());
-        // create the view of the stage by using the StageFactory
+        // create the main.view of the stage by using the StageFactory
         GameStageView gameStageView = StageFactory.createStageView(stageName, gameStageModel);
         // create the looks of the stage (NB: no factory this time !)
         gameStageView.createLooks();
@@ -62,13 +62,13 @@ public abstract class Controller {
         }
          /* At this point, there may be elements that have been put in some containers.
            Thus events have been generated, and they must be processed before starting the game
-           in order to have a correct location of all looks on the screen and to set the view with
+           in order to have a correct location of all looks on the screen and to set the main.view with
            the correct size
          */
         processEvents();
-        // start the game, from the model point of view.
+        // start the game, from the main.model point of main.view.
         model.startGame(gameStageModel);
-        // set the view so that the current pane view can integrate all the looks of the current game stage view.
+        // set the main.view so that the current pane main.view can integrate all the looks of the current game stage main.view.
         view.setView(gameStageView);
 
     }
@@ -118,7 +118,7 @@ public abstract class Controller {
         Logger.trace(" called", this);
         // for each element : process all event and then update
         mapElementLook.forEach((k,v) -> {
-            // update the model of the element, in case of there is really something to do (see comment before GameElement.update())
+            // update the main.model of the element, in case of there is really something to do (see comment before GameElement.update())
             k.update();
         });
     }
@@ -185,7 +185,7 @@ public abstract class Controller {
         frameNumber++;
         // process all events & updates
         processEvents();
-        // update the view
+        // update the main.view
         view.update();
     }
 

@@ -2,11 +2,6 @@ package boardifier.model;
 
 import boardifier.model.animation.Animation;
 
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Queue;
-
 
 /**
  * abstract class that describes an element of the game, in the largest sense.
@@ -262,7 +257,7 @@ public abstract class GameElement {
             eventQueue.addChangeSelectionEvent();
         }
 
-        // update game stage model set of selected elements
+        // update game stage main.model set of selected elements
         gameStageModel.setSelected(this, true);
         this.selected = true;
     }
@@ -278,7 +273,7 @@ public abstract class GameElement {
         if (this.selected) {
             eventQueue.addChangeSelectionEvent();
         }
-        // update game stage model set of selected elements
+        // update game stage main.model set of selected elements
         gameStageModel.setSelected(this, false);
         this.selected = false;
     }
@@ -418,7 +413,7 @@ public abstract class GameElement {
 
     /* *********************************************
        TRAMPOLINE METHODS
-       NB: gain access to the current model
+       NB: gain access to the current main.model
      ********************************************* */
     public Model getModel() {
         return gameStageModel.getModel();

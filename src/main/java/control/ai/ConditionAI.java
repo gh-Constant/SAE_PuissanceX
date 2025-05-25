@@ -4,17 +4,18 @@ import boardifier.model.Model;
 import boardifier.control.Controller;
 import boardifier.model.action.ActionList;
 import boardifier.control.ActionFactory;
+import control.PuissanceXDecider;
+import control.SimplifyBoard;
 import model.PuissanceXDisk;
 import model.PuissanceXModel;
 import model.PuissanceXStageModel;
 import model.PuissanceXBoard;
-import control.SimplifyBoard;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public class ConditionAI extends control.PuissanceXDecider {
+public class ConditionAI extends PuissanceXDecider {
 
     public ConditionAI(Model model, Controller control) {
         super(model, control);

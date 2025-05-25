@@ -4,6 +4,7 @@ import boardifier.model.Model;
 import boardifier.control.Controller;
 import boardifier.model.action.ActionList;
 import boardifier.control.ActionFactory;
+import control.PuissanceXDecider;
 import model.PuissanceXDisk;
 import model.PuissanceXModel;
 import model.PuissanceXStageModel;
@@ -13,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public class RandomAIDecider extends control.PuissanceXDecider {
+public class RandomAIDecider extends PuissanceXDecider {
     private Random random;
     
     public RandomAIDecider(Model model, Controller control) {

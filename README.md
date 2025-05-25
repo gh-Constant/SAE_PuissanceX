@@ -10,7 +10,7 @@ The project follows the MVC (Model-View-Controller) architecture:
 
 - **Model**: Contains game logic and state
 - **View**: Handles display of game elements
-- **Controller**: Coordinates interactions between model and view
+- **Controller**: Coordinates interactions between main.model and main.view
 
 ## Development Roadmap
 
@@ -103,7 +103,7 @@ The project follows the MVC (Model-View-Controller) architecture:
     private int evaluateBoard(Board board) {
         int score = 0;
         
-        // Evaluate center control (center columns are more valuable)
+        // Evaluate center main.control (center columns are more valuable)
         // Evaluate connected pieces (2-in-a-row, 3-in-a-row)
         // Evaluate blocking opponent's potential wins
         // Evaluate winning positions
@@ -148,14 +148,14 @@ The project follows the MVC (Model-View-Controller) architecture:
   - [ ] Implement self-play for additional training data
   - [ ] Create data augmentation through board rotations/reflections
 
-- [ ] **Train neural network model**
+- [ ] **Train neural network main.model**
   - [ ] Set up training pipeline
   - [ ] Implement supervised learning from MinMax data
   - [ ] Add reinforcement learning through self-play
   - [ ] Tune hyperparameters for optimal performance
 
 - [ ] **Create DeepLearningPlayer class**
-  - [ ] Implement model loading and inference
+  - [ ] Implement main.model loading and inference
     ```java
     public DeepLearningPlayer(int playerId) {
         this.playerId = playerId;
@@ -168,7 +168,7 @@ The project follows the MVC (Model-View-Controller) architecture:
         float[] input = boardToInput(board);
         
         // Run inference
-        float[] predictions = model.predict(input);
+        float[] predictions = main.model.predict(input);
         
         // Select best valid move
         int bestCol = -1;
@@ -191,7 +191,7 @@ The project follows the MVC (Model-View-Controller) architecture:
     ```
 
   - [ ] Add hybrid decision making (combining NN and MinMax)
-  - [ ] Implement confidence thresholds for model predictions
+  - [ ] Implement confidence thresholds for main.model predictions
 
 ### 4. JavaFX GUI Implementation
 - [ ] **Create JavaFX-specific look classes**

@@ -8,8 +8,8 @@ import java.util.List;
 public abstract class GameStageView {
 
     /**
-     * The assocaited game stage model
-     * Obviously, the model must be instantiated BEFORE the game stage.
+     * The assocaited game stage main.model
+     * Obviously, the main.model must be instantiated BEFORE the game stage.
      */
     protected GameStageModel gameStageModel;
 
@@ -25,7 +25,7 @@ public abstract class GameStageView {
     protected List<ElementLook> looks;
 
     /**
-     * The width of the game view in space.
+     * The width of the game main.view in space.
      * If width and height are set to -1, the scene will be resized to the boundaries of all elements in the stage.
      * Otherwise, the scene will have the given dimension, clipping what is outside its boundaries.
      *

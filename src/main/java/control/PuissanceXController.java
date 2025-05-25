@@ -9,7 +9,6 @@ import boardifier.model.Model;
 import boardifier.model.Player;
 import boardifier.model.action.ActionList;
 import boardifier.view.View;
-import control.ai.RandomAIDecider;
 import model.PuissanceXBoard;
 import model.PuissanceXDisk;
 import model.PuissanceXStageModel;
@@ -18,7 +17,7 @@ import java.util.Scanner;
 
 /**
  * Controller for the PuissanceX game.
- * Handles game flow, user input, and interactions between model and view.
+ * Handles game flow, user input, and interactions between main.model and main.view.
  */
 public class PuissanceXController extends Controller {
 
@@ -39,7 +38,7 @@ public class PuissanceXController extends Controller {
     }
 
     /**
-     * Starts the game by initializing the model and view.
+     * Starts the game by initializing the main.model and main.view.
      */
     @Override
     public void startGame() {

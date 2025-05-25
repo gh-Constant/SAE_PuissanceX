@@ -2,7 +2,6 @@ package view;
 
 import boardifier.control.Logger;
 import boardifier.model.ContainerElement;
-import boardifier.view.ConsoleColor;
 import boardifier.view.GridLook;
 
 public class YellowDiskPot extends GridLook {
