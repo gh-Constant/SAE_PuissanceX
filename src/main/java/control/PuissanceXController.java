@@ -24,6 +24,7 @@ public class PuissanceXController extends Controller {
     private Scanner scanner;
     private Decider aiDecider;
     private Decider secondAiDecider;
+    private int endGameChoice = 0; // 0 = pas encore défini, 1 = rejouer, 2 = menu principal, 3 = quitter
 
     /**
      * Constructor for the PuissanceX controller.
@@ -207,5 +208,51 @@ public class PuissanceXController extends Controller {
         } else {
             System.out.println("Game ended in a draw!");
         }
+        
+        // Afficher le menu de fin de partie
+        showEndGameOptions();
+    }
+    
+    private void showEndGameOptions() {
+        System.out.println("\n╔════════════════════════════════════╗");
+        System.out.println("║            PARTIE TERMINÉE         ║");
+        System.out.println("╠════════════════════════════════════╣");
+        System.out.println("║ 1. Rejouer                         ║");
+        System.out.println("║ 2. Retour au menu principal        ║");
+        System.out.println("║ 3. Quitter                         ║");
+        System.out.println("╚════════════════════════════════════╝");
+        
+        boolean validChoice = false;
+        while (!validChoice) {
+            System.out.print("Entrez votre choix (1-3): ");
+            try {
+                String input = scanner.nextLine().trim();
+                int choice = Integer.parseInt(input);
+                
+                if (choice >= 1 && choice <= 3) {
+                    endGameChoice = choice;
+                    validChoice = true;
+                } else {
+                    System.out.println("Veuillez entrer un nombre entre 1 et 3.");
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("Veuillez entrer un nombre valide.");
+            }
+        }
+    }
+    
+    /**
+     * Retourne le choix de fin de partie du joueur.
+     * @return 1 = rejouer, 2 = menu principal, 3 = quitter
+     */
+    public int getEndGameChoice() {
+        return endGameChoice;
+    }
+    
+    /**
+     * Réinitialise le choix de fin de partie.
+     */
+    public void resetEndGameChoice() {
+        endGameChoice = 0;
     }
 }

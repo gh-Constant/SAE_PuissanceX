@@ -46,8 +46,20 @@ public class PuissanceXStageView extends GameStageView {
         BoardLook boardLook = new BoardLook(model.getBoard());
         addLook(boardLook);
         
-        // Create look for the player text
-        TextLook textLook = new TextLook(model.getPlayerText());
+        // Create look for the player text with custom formatting and column numbers
+        TextLook textLook = new TextLook(model.getPlayerText()) {
+            @Override
+            public void render() {
+                // D'abord afficher les numéros de colonnes
+                boardLook.renderColumnNumbers();
+                
+                // Puis afficher le texte du joueur
+                super.render();
+                
+                // Ajouter une ligne vide après le texte du joueur pour une meilleure lisibilité
+                System.out.println();
+            }
+        };
         addLook(textLook);
         
         // Create pot looks with text labels above them

@@ -19,16 +19,18 @@ public class PuissanceXConsole {
         Logger.info("Starting PuissanceX Console...");
 
         boolean continuePlaying = true;
+        boolean showMainMenu = true;
+        
+        // Default values
+        int winCondition = 4;
+        int boardRows = 6;
+        int boardCols = 7;
+        int currentGameMode = 1;
+        PuissanceXMenu menu = null;
+        
         while (continuePlaying) {
-            // Default values
-            int winCondition = 4;
-            int boardRows = 6;
-            int boardCols = 7;
-            int currentGameMode = 1;
-            PuissanceXMenu menu = null;
-            
             // If no arguments are provided, show the menu
-            if (args.length == 0) {
+            if (args.length == 0 && showMainMenu) {
                 menu = new PuissanceXMenu();
                 boolean startGame = menu.showMenu();
                 
@@ -48,6 +50,8 @@ public class PuissanceXConsole {
                 Logger.info("  Board rows: " + boardRows);
                 Logger.info("  Board columns: " + boardCols);
                 Logger.info("  Game mode: " + currentGameMode);
+                
+                showMainMenu = false; // Ne plus afficher le menu principal sauf si demandé
             }
             else {
                 try {
@@ -91,15 +95,15 @@ public class PuissanceXConsole {
             model.setBoardCols(boardCols);
 
             Logger.info("Setting up players for mode: " + currentGameMode);
-            if (currentGameMode == 0) {
+            if (currentGameMode == 1) {
                 model.addHumanPlayer("player1");
                 model.addHumanPlayer("player2");
                 Logger.debug("Added player1 (Human) and player2 (Human).");
-            } else if (currentGameMode == 1) {
+            } else if (currentGameMode == 2) {
                 model.addHumanPlayer("player");
                 model.addComputerPlayer("computer");
                 Logger.debug("Added player (Human) and computer (AI).");
-            } else {
+            } else if (currentGameMode == 3) {
                 model.addComputerPlayer("computer1");
                 model.addComputerPlayer("computer2");
                 Logger.debug("Added computer1 (AI) and computer2 (AI).");
@@ -115,48 +119,68 @@ public class PuissanceXConsole {
             Logger.debug("PuissanceXController object created.");
             
             // Set up AI decider if needed
-            if (currentGameMode == 1 || currentGameMode == 2) {
+            if (currentGameMode == 2 || currentGameMode == 3) {
                 if (args.length == 0) {  // Si on utilise le menu
-                    // Configure first AI
-                    switch (menu.getAIType1()) {
-                        case 0:
-                            control.setAIDecider(new Minimax(model, control));
-                            Logger.debug("Minimax AI created and set for first AI player");
-                            break;
-                        case 1:
-                            control.setAIDecider(new RandomAIDecider(model, control));
-                            Logger.debug("Random AI created and set for first AI player");
-                            break;
-                        case 2:
-                            control.setAIDecider(new ConditionAI(model, control));
-                            Logger.debug("Condition AI created and set for first AI player");
-                            break;
-                    }
-
-                    // If it's AI vs AI, configure second AI
                     if (currentGameMode == 2) {
-                        switch (menu.getAIType2()) {
-                            case 0:
-                                control.setSecondAIDecider(new Minimax(model, control));
-                                Logger.debug("Minimax AI created and set for second AI player");
-                                break;
+                        // Pour Human vs Computer, l'IA est le joueur 1 (secondAiDecider)
+                        switch (menu.getAIType1()) {
                             case 1:
-                                control.setSecondAIDecider(new RandomAIDecider(model, control));
-                                Logger.debug("Random AI created and set for second AI player");
+                                control.setSecondAIDecider(new Minimax(model, control));
+                                Logger.debug("Minimax AI created and set for computer player (player 1)");
                                 break;
                             case 2:
+                                control.setSecondAIDecider(new RandomAIDecider(model, control));
+                                Logger.debug("Random AI created and set for computer player (player 1)");
+                                break;
+                            case 3:
                                 control.setSecondAIDecider(new ConditionAI(model, control));
-                                Logger.debug("Condition AI created and set for second AI player");
+                                Logger.debug("Condition AI created and set for computer player (player 1)");
+                                break;
+                        }
+                    } else if (currentGameMode == 3) {
+                        // Pour AI vs AI, configurer les deux IA
+                        switch (menu.getAIType1()) {
+                            case 1:
+                                control.setAIDecider(new Minimax(model, control));
+                                Logger.debug("Minimax AI created and set for first AI player (player 0)");
+                                break;
+                            case 2:
+                                control.setAIDecider(new RandomAIDecider(model, control));
+                                Logger.debug("Random AI created and set for first AI player (player 0)");
+                                break;
+                            case 3:
+                                control.setAIDecider(new ConditionAI(model, control));
+                                Logger.debug("Condition AI created and set for first AI player (player 0)");
+                                break;
+                        }
+                        
+                        switch (menu.getAIType2()) {
+                            case 1:
+                                control.setSecondAIDecider(new Minimax(model, control));
+                                Logger.debug("Minimax AI created and set for second AI player (player 1)");
+                                break;
+                            case 2:
+                                control.setSecondAIDecider(new RandomAIDecider(model, control));
+                                Logger.debug("Random AI created and set for second AI player (player 1)");
+                                break;
+                            case 3:
+                                control.setSecondAIDecider(new ConditionAI(model, control));
+                                Logger.debug("Condition AI created and set for second AI player (player 1)");
                                 break;
                         }
                     }
                 } else {  // Si on utilise les arguments en ligne de commande
                     // Par défaut, utiliser Minimax
-                    control.setAIDecider(new Minimax(model, control));
                     if (currentGameMode == 2) {
+                        // Pour Human vs Computer, l'IA est le joueur 1 (secondAiDecider)
                         control.setSecondAIDecider(new Minimax(model, control));
+                        Logger.debug("Default Minimax AI created for computer player (player 1)");
+                    } else if (currentGameMode == 3) {
+                        // Pour AI vs AI, configurer les deux IA
+                        control.setAIDecider(new Minimax(model, control));
+                        control.setSecondAIDecider(new Minimax(model, control));
+                        Logger.debug("Default Minimax AIs created for both AI players");
                     }
-                    Logger.debug("Default Minimax AI(s) created for command line execution");
                 }
             }
             
@@ -171,14 +195,46 @@ public class PuissanceXConsole {
                 control.stageLoop();
                 Logger.info("Stage loop exited. Game ended.");
                 Thread.sleep(2000);
+                
+                // Gérer le choix de fin de partie
+                if (args.length == 0) { // Seulement si on utilise le menu interactif
+                    int endGameChoice = control.getEndGameChoice();
+                    
+                    switch (endGameChoice) {
+                        case 1: // Rejouer
+                            Logger.info("Player chose to replay. Starting new game with same settings.");
+                            control.resetEndGameChoice();
+                            // Continue la boucle avec les mêmes paramètres
+                            break;
+                        case 2: // Retour au menu principal
+                            Logger.info("Player chose to return to main menu.");
+                            showMainMenu = true;
+                            control.resetEndGameChoice();
+                            break;
+                        case 3: // Quitter
+                            Logger.info("Player chose to exit. Goodbye!");
+                            continuePlaying = false;
+                            break;
+                        default:
+                            Logger.info("No valid choice made. Returning to main menu.");
+                            showMainMenu = true;
+                            break;
+                    }
+                } else {
+                    // Si des arguments ont été fournis en ligne de commande, on sort de la boucle
+                    continuePlaying = false;
+                }
+                
             } catch (Exception e) {
                 Logger.info("An unexpected error occurred: " + e.getMessage() + ". Aborting.");
                 Logger.info("ERROR_DETAILS: " + e);
-            }
-
-            // Si des arguments ont été fournis en ligne de commande, on sort de la boucle
-            if (args.length > 0) {
-                continuePlaying = false;
+                
+                // En cas d'erreur, retourner au menu principal si on est en mode interactif
+                if (args.length == 0) {
+                    showMainMenu = true;
+                } else {
+                    continuePlaying = false;
+                }
             }
         }
     }
