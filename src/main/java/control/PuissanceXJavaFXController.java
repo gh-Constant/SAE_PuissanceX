@@ -15,6 +15,7 @@ import javafx.scene.control.ButtonType;
 import model.PuissanceXBoard;
 import model.PuissanceXDisk;
 import model.PuissanceXStageModel;
+import view.GameLauncher;
 
 /**
  * JavaFX Controller for the PuissanceX game.
@@ -22,16 +23,18 @@ import model.PuissanceXStageModel;
  */
 public class PuissanceXJavaFXController extends Controller {
 
-    private Decider aiDecider;
-    private Decider secondAiDecider;
+    public Decider aiDecider;
+    public Decider secondAiDecider;
     private boolean gameEnded = false;
     private boolean inUpdate = false;
+    private GameLauncher mainApp;
 
     /**
      * Constructor for the PuissanceX JavaFX controller.
      */
-    public PuissanceXJavaFXController(Model model, View view) {
+    public PuissanceXJavaFXController(Model model, View view, GameLauncher mainApp) {
         super(model, view);
+        this.mainApp = mainApp;
         this.aiDecider = null;
         this.secondAiDecider = null;
     }
@@ -119,51 +122,58 @@ public class PuissanceXJavaFXController extends Controller {
         int currentPlayer = model.getIdPlayer();
         Player player = model.getPlayers().get(currentPlayer);
         
-        System.out.println("Player " + (currentPlayer + 1) + " (" + model.getCurrentPlayerName() + "), your turn.");
+        System.out.println("DEBUG: Starting turn for Player " + (currentPlayer + 1) + " (" + model.getCurrentPlayerName() + ")");
+        System.out.println("DEBUG: Player type: " + (player.getType() == Player.COMPUTER ? "Computer" : "Human"));
         
         // Check if current player is AI
         if (player.getType() == Player.COMPUTER) {
-            System.out.println("AI is thinking...");
+            System.out.println("DEBUG: AI turn - Player " + (currentPlayer + 1));
             
             // Use the appropriate AI decider based on the current player
             Decider currentDecider;
             if (currentPlayer == 0) {
                 currentDecider = aiDecider;
+                System.out.println("DEBUG: Using first AI decider: " + (currentDecider != null ? currentDecider.getClass().getSimpleName() : "null"));
             } else {
                 currentDecider = secondAiDecider;
+                System.out.println("DEBUG: Using second AI decider: " + (currentDecider != null ? currentDecider.getClass().getSimpleName() : "null"));
             }
             
             if (currentDecider != null) {
                 // Add a small delay for AI moves to make them visible
                 new Thread(() -> {
                     try {
+                        System.out.println("DEBUG: AI " + (currentPlayer + 1) + " is thinking...");
                         Thread.sleep(1000); // 1 second delay
                         ActionList actions = currentDecider.decide();
                         if (actions != null) {
+                            System.out.println("DEBUG: AI " + (currentPlayer + 1) + " made a decision");
+                            actions.setDoEndOfTurn(false); // We'll handle end of turn manually
                             ActionPlayer actionPlayer = new ActionPlayer(model, this, actions);
                             actionPlayer.start();
 
                             // Wait for the action to complete before continuing
                             actionPlayer.join();
+                            System.out.println("DEBUG: AI " + (currentPlayer + 1) + " action completed");
 
                             Platform.runLater(() -> {
                                 checkGameEndConditions(board);
                                 continueGame();
                             });
                         } else {
-                            System.out.println("AI couldn't make a valid move!");
+                            System.out.println("ERROR: AI " + (currentPlayer + 1) + " couldn't make a valid move!");
                         }
                     } catch (InterruptedException e) {
                         Thread.currentThread().interrupt();
+                        System.err.println("ERROR: AI " + (currentPlayer + 1) + " thread interrupted");
                     }
                 }).start();
             } else {
-                System.out.println("Error: AI decider not set!");
+                System.err.println("ERROR: AI decider not set for Player " + (currentPlayer + 1) + "!");
             }
         } else {
             // Human player's turn - wait for mouse click on the board
-            // The mouse click will be handled by the view and will call handleHumanMove
-            System.out.println("Waiting for human player to make a move...");
+            System.out.println("DEBUG: Waiting for human player to make a move...");
         }
     }
     
@@ -209,20 +219,30 @@ public class PuissanceXJavaFXController extends Controller {
         }
 
         try {
+            // Set update flag to prevent concurrent updates
+            inUpdate = true;
+
             // Check if the column is valid
             if (col < 0 || col >= board.getNbCols()) {
                 showAlert("Invalid Move", "Invalid column number.");
+                inUpdate = false;
                 return;
             }
 
             // Check if the column is full
             if (board.isColumnFull(col)) {
                 showAlert("Invalid Move", "Column " + (col + 1) + " is full. Try another one.");
+                inUpdate = false;
                 return;
             }
 
             // Find the first empty row in the column
             int row = board.getFirstEmptyRow(col);
+            if (row == -1) {
+                showAlert("Invalid Move", "Column " + (col + 1) + " is full. Try another one.");
+                inUpdate = false;
+                return;
+            }
 
             // Create a new disk
             PuissanceXDisk disk = new PuissanceXDisk(currentPlayer, stageModel);
@@ -231,31 +251,43 @@ public class PuissanceXJavaFXController extends Controller {
             ActionList actions = ActionFactory.generatePutInContainer(this, model, disk, "board", row, col);
             actions.setDoEndOfTurn(false); // We'll handle end of turn manually
 
-            // Play the action synchronously to avoid threading issues
+            // Play the action synchronously
             ActionPlayer actionPlayer = new ActionPlayer(model, this, actions);
             actionPlayer.start();
 
-            // Wait for the action to complete before continuing
-            new Thread(() -> {
+            // Wait for the action to complete in a separate thread
+            Thread actionThread = new Thread(() -> {
                 try {
                     actionPlayer.join(); // Wait for the action to complete
-
+                    
+                    // Ensure UI updates happen on the JavaFX thread
                     Platform.runLater(() -> {
-                        // Check for win or draw after the move is complete
-                        checkGameEndConditions(board);
-
-                        // Continue the game
-                        continueGame();
+                        try {
+                            // Check for win or draw after the move is complete
+                            checkGameEndConditions(board);
+                            // Continue the game
+                            continueGame();
+                        } finally {
+                            // Always reset the update flag, even if an error occurs
+                            inUpdate = false;
+                        }
                     });
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                     System.err.println("Interrupted while waiting for action to complete");
+                    Platform.runLater(() -> inUpdate = false);
+                } catch (Exception e) {
+                    System.err.println("Error during action execution: " + e.getMessage());
+                    e.printStackTrace();
+                    Platform.runLater(() -> inUpdate = false);
                 }
-            }).start();
+            });
+            actionThread.start();
 
         } catch (Exception e) {
-            System.out.println("Error handling human move: " + e.getMessage());
+            System.err.println("Error handling human move: " + e.getMessage());
             e.printStackTrace();
+            inUpdate = false;
         }
     }
     
@@ -341,10 +373,11 @@ public class PuissanceXJavaFXController extends Controller {
     }
     
     private void returnToMainMenu() {
-        // This would need to be implemented to return to the main menu
-        // For now, we'll just exit
-        System.out.println("Returning to main menu...");
-        // TODO: Implement return to main menu functionality
+        Platform.runLater(() -> {
+            if (mainApp != null) {
+                mainApp.showMainMenu();
+            }
+        });
     }
     
     /**
