@@ -1,135 +1,117 @@
 package boardifier.view;
 
+import boardifier.control.Logger;
 import boardifier.model.Coord2D;
 import boardifier.model.GameElement;
+import javafx.geometry.Point2D;
+import javafx.scene.Group;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Font;
+import javafx.scene.text.Text;
 
 import java.util.Collections;
-import java.util.List;
 
-public class RootPane {
+public class RootPane extends Pane {
 
     protected GameStageView gameStageView;
-    private String[][] viewPort;
-    private int width;
-    private int height;
-
-    public RootPane(int width, int height) {
-        this.width = width;
-        this.height = height;
-        viewPort = new String[height][width];
-        clearViewPort();
-        gameStageView = null;
-    }
+    protected Group group; // the group that contains all game elements of the current stage
+    private Point2D posInScene; // for convenience. Setup at each call of init, even it normally does not change
 
     public RootPane() {
-        this(1,1);
+        this.gameStageView = null;
+        group = new Group();
+        //setBackground(Background.EMPTY);
+        resetToDefault();
     }
 
-    public void clearViewPort() {
-        for(int i=0;i<height;i++) {
-            for(int j=0;j<width;j++) {
-                viewPort[i][j] = " ";
-            }
-        }
+    public final void resetToDefault() {
+        createDefaultGroup();
+        // add the group to the pane
+        getChildren().clear();
+        getChildren().add(group);
     }
 
+    /**
+     * create the element of the default group
+     * This method can be overriden to define a different visual aspect.
+     */
+    protected void createDefaultGroup() {
+        Rectangle frame = new Rectangle(100, 100, Color.LIGHTGREY);
+        // remove existing children
+        group.getChildren().clear();
+        // adding default ones
+        group.getChildren().addAll(frame);
+    }
+    /**
+     * Initialize the content of the group.
+     * It takes the elements of the model, which are initialized when starting a game stage.
+     * It sorts them so that the element with the highest depth are put in first in the group.
+     * So they will be hidden by elements with a lower depth.
+     */
     public final void init(GameStageView gameStageView) {
+        posInScene = group.localToScene(0,0); // get the position of the RootPane group within the scene
         if (gameStageView != null) {
             this.gameStageView = gameStageView;
+            // first sort element by their depth
             Collections.sort(gameStageView.getLooks(), (a, b) -> a.getDepth() - b.getDepth());
+            // remove existing children
+            group.getChildren().clear();
+            // add game element looks
             for (ElementLook look : gameStageView.getLooks()) {
                 // setup rootpane reference for every look
                 look.setRootPane(this);
+                // just add looks with no parents
+                if (!look.hasParent()) {
+                    Group group = look.getGroup();
+                    this.group.getChildren().add(group);
+                }
             }
+            // add the group to the pane
+            getChildren().clear();
+            getChildren().add(group);
         }
     }
 
-    public void udpate() {
-        /*
-        // first update the game stage main.view if it exists
-        if (gameStageView != null) {
-            gameStageView.update();
-        }
-
-         */
-        // then create the viewport
-
-        // first, determine the size of the main.view
-        int w = 0;
-        int h = 0;
-
-        List<ElementLook> looks = gameStageView.getLooks();
-        for (ElementLook look : looks) {
-            GameElement element = look.getElement();
-            // just take elements in the stage that are visible and with a look that is not within a container look
-            if (element.isInStage() && element.isVisible() && !look.hasParent()) {
-                if ((look.getWidth() + element.getX()) > w) {
-                    w = (int) (look.getWidth() + element.getX());
-                }
-                if ((look.getHeight() + element.getY()) > h) {
-                    h = (int) (look.getHeight() + element.getY());
-                }
-            }
-        }
-        if ((w != width) || (h != height)) {
-            width = w;
-            height = h;
-            viewPort = new String[height][width];
-        }
-        clearViewPort();
-
-        // now render looks
-        for  (ElementLook look : looks) {
-            GameElement element = look.getElement();
-            // just take elements in the stage that are: visible and in the scene
-            if (element.isInStage() && element.isVisible() && !look.hasParent()) {
-                // first render the look to its internal shape array
-                look.render();
-                // now copy the internal array in the viewport
-                for (int i = 0; i < look.getHeight(); i++) {
-                    for (int j = 0; j < look.getWidth(); j++) {
-                        if ((element.getY() + i >= 0) && (element.getX() + j >= 0)) {
-                            String s = look.getShapePoint(j, i);
-                            if ((s != null) && (!" ".equals(s))) {
-                                viewPort[(int) (element.getY() + i)][(int) (element.getX() + j)] = s;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    public void print() {
-        for(int i=0;i<height;i++) {
-            for(int j=0;j<width;j++) {
-                System.out.print(viewPort[i][j]);
-            }
-            System.out.println();
-        }
+    public void attachLookToRootPane(ElementLook look) {
+        // get the current coordinates
+        group.getChildren().add(look.getGroup());
     }
 
     public Coord2D getRootPaneLocationFromLookLocation(ElementLook look) {
-        double x = look.getElement().getX();
-        double y = look.getElement().getY();
+        double localX = look.getElement().getX();
+        double localY = look.getElement().getY();
 
-        // if the look has no parent container, it is already in the rootpane space
-        if (!look.hasParent()) {
-            return new Coord2D(x,y);
+        if (look.hasParent()) {
+            Point2D pScene = look.getParent().getGroup().localToScene(localX, localY);
+            return new Coord2D(pScene.getX()-posInScene.getX(), pScene.getY() - posInScene.getY());
         }
-        // else, get the upper most container in the hierarchy
-        ContainerLook up = (ContainerLook) look.getParent();
-        // at this point localX, localY are the cooridnates in the direct parent of look
-        while (up.hasParent() ) {
-            // update localX, localY, using the position of the parent container
-            x += up.getElement().getX();
-            y += up.getElement().getY();
-            up = (ContainerLook) up.getParent();
-        }
-        // add the position of the upper most container in the root pane
-        x += up.getElement().getX();
-        y += up.getElement().getY();
-        return new Coord2D(x, y);
+        // else x,y are already within RootPane space
+        return new Coord2D(localX,localY);
     }
+    /**
+     * If the look has a parent, the parameters are used to compute the location of the
+     * look within
+     * @param look
+     * @param rootPaneX
+     * @param rootPaneY
+     * @return
+     */
+    public Coord2D getLookLocationFromRootPaneLocation(ElementLook look, double rootPaneX, double rootPaneY) {
+        if (look.hasParent()) {
+            Point2D pScene = localToScene(rootPaneX, rootPaneY);
+        }
+        // else x,y are already within RootPane space
+        return new Coord2D(rootPaneX,rootPaneY);
+    }
+    /* ***************************************
+       TRAMPOLINE METHODS
+    **************************************** */
 
+    public ElementLook getElementLook(GameElement element) {
+        if (gameStageView == null) return null;
+        return gameStageView.getElementLook(element);
+    }
 }
