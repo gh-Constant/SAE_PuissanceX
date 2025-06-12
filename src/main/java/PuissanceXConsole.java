@@ -112,12 +112,16 @@ public class PuissanceXConsole {
             Logger.info("Registering PuissanceX model and view with StageFactory.");
             StageFactory.registerModelAndView("puissanceX", "model.PuissanceXStageModel", "view.PuissanceXStageView");
             
-            View gameView = new View(model); 
+            // TODO: Fix console version - for now, comment out to focus on JavaFX
+            // View gameView = new View(model);
             Logger.debug("View object (boardifier.view.View) created.");
 
-            PuissanceXController control = new PuissanceXController(model, gameView);
+            // TODO: Fix console version
+            // PuissanceXController control = new PuissanceXController(model, gameView);
             Logger.debug("PuissanceXController object created.");
             
+            // TODO: Fix console version - commenting out for now
+            /*
             // Set up AI decider if needed
             if (currentGameMode == 2 || currentGameMode == 3) {
                 if (args.length == 0) {  // Si on utilise le menu
@@ -183,10 +187,10 @@ public class PuissanceXConsole {
                     }
                 }
             }
-            
+
             control.setFirstStageName("puissanceX");
             Logger.debug("First stage name set to 'puissanceX'.");
-            
+
 
             try {
                 Logger.info("Attempting to start game...");
@@ -195,11 +199,11 @@ public class PuissanceXConsole {
                 control.stageLoop();
                 Logger.info("Stage loop exited. Game ended.");
                 Thread.sleep(2000);
-                
+
                 // Gérer le choix de fin de partie
                 if (args.length == 0) { // Seulement si on utilise le menu interactif
                     int endGameChoice = control.getEndGameChoice();
-                    
+
                     switch (endGameChoice) {
                         case 1: // Rejouer
                             Logger.info("Player chose to replay. Starting new game with same settings.");
@@ -224,11 +228,11 @@ public class PuissanceXConsole {
                     // Si des arguments ont été fournis en ligne de commande, on sort de la boucle
                     continuePlaying = false;
                 }
-                
+
             } catch (Exception e) {
                 Logger.info("An unexpected error occurred: " + e.getMessage() + ". Aborting.");
                 Logger.info("ERROR_DETAILS: " + e);
-                
+
                 // En cas d'erreur, retourner au menu principal si on est en mode interactif
                 if (args.length == 0) {
                     showMainMenu = true;
@@ -236,6 +240,11 @@ public class PuissanceXConsole {
                     continuePlaying = false;
                 }
             }
+            */
+
+            // Console version temporarily disabled - use JavaFX version instead
+            Logger.info("Console version is temporarily disabled. Please use the JavaFX version: PuissanceXJavaFX");
+            return;
         }
     }
 }

@@ -39,7 +39,7 @@ public class PuissanceXDecider extends Decider {
         PuissanceXDisk puissanceXDisk = new PuissanceXDisk(currentPlayer, stageModel);
 
         // Create the action to put the disk in the chosen column
-        ActionList actions = ActionFactory.generatePutInContainer(model, puissanceXDisk, "board", row, column);
+        ActionList actions = ActionFactory.generatePutInContainer(control, model, puissanceXDisk, "board", row, column);
         actions.setDoEndOfTurn(true);
 
         System.out.println("AI player " + (currentPlayer + 1) + " chooses column " + column);
