@@ -1,5 +1,8 @@
 package boardifier.model;
 
+import boardifier.control.Logger;
+import boardifier.view.ElementLook;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,7 +37,7 @@ public class ContainerElement extends StaticElement {
         }
 
         reachableCells = new boolean[nbRows][nbCols];
-        resetReachableCells(true, false);
+        resetReachableCells(true);
     }
 
     // getters/setters
@@ -133,35 +136,21 @@ public class ContainerElement extends StaticElement {
             }
         }
         // add a face event because the structure of the container changed, thus its look must also change.
-        if (doEvent) {
-            addChangeFaceEvent();
-        }
+        if (doEvent) addChangeFaceEvent();
     }
 
     private void clearCellSpan(int row, int col) {
         clearCellSpan(row, col, true);
     }
 
-    /**
-     * Since boardifierconsole is in text mode, the default behaviour is to have no special rendering
-     * for cells that can be reached, after for example, selecting an element that should be played.
-     * This is why this method calls the general method below with a second parameter as false, to prevent
-     * a ChangeFace event to be created.
-     * @param state
-     */
     public void resetReachableCells(boolean state) {
-        resetReachableCells(state, false);
-    }
-    public void resetReachableCells(boolean state, boolean doEvent) {
         for (int i = 0; i < nbRows; i++) {
             for (int j = 0; j < nbCols; j++) {
                 reachableCells[i][j] = state;
             }
         }
         // in some games, changing the reachable state has an impact on the grid look
-        if (doEvent) {
-            addChangeFaceEvent();
-        }
+        addChangeFaceEvent();
     }
 
     public boolean[][] getReachableCells() {
@@ -169,15 +158,10 @@ public class ContainerElement extends StaticElement {
     }
 
     public void setCellReachable(int row, int col, boolean reachable) {
-
         if ((row >= 0) && (row < nbRows) && (col >= 0) && (col < nbCols)) {
-
-            if (reachableCells[row][col] != reachable) {
-
-                reachableCells[row][col] = reachable;
-                // in some games, changing the reachable state has an impact on the grid look
-                addChangeFaceEvent();
-            }
+            reachableCells[row][col] = reachable;
+            // in some games, changing the reachable state has an impact on the grid look
+            addChangeFaceEvent();
         }
     }
 
@@ -188,7 +172,7 @@ public class ContainerElement extends StaticElement {
         return false;
     }
 
-    // reset the board by removing elements from the board AND from the elements in main.model
+    // reset the board by removing elements from the board AND from the elements in model
     public void reset() {
         for (int i = 0; i < nbRows; i++) {
             for (int j = 0; j < nbCols; j++) {
@@ -208,10 +192,11 @@ public class ContainerElement extends StaticElement {
         }
         grid[r][c].add(element);
         element.setContainer(this);
-
+        // lock the element until the put is fulfilled by the controller
+        element.startContainerOp();
         // signal that element has changed of grid => the inner layout has to take ownership of the element look, which is initiated by the controller
         element.addPutInContainerEvent(this, row, col);
-        // signal the stage main.model that element is put in grid so that callback can be exectued
+        // signal the stage model that element is put in grid so that callback can be executed
         gameStageModel.putInContainer(element, this, row, col);
     }
 
@@ -231,13 +216,17 @@ public class ContainerElement extends StaticElement {
             r = -rowSpans[row][col];
             c = -colSpans[row][col];
         }
-        if ((grid[r][c].isEmpty()) || (!grid[r][c].contains(element))) return;
+        if ((grid[r][c].isEmpty()) || (!grid[r][c].contains(element))) {
+            Logger.trace("element to remove is not in a cell of this container");
+            return;
+        }
         grid[row][col].remove(element);
         element.setContainer(null);
-
+        // lock the element until the removal is fulfilled by the controller
+        element.startContainerOp();
         // signal that element has changed of grid => the inner layout has to take ownership of the element look, which is initiated by the controller
         element.addRemoveFromContainerEvent(this, row, col);
-        // signal the stage main.model that element is removed from grid so that callback can be executed
+        // signal the stage model that element is removed from grid so that callback can be executed
         gameStageModel.removedFromContainer(element, this, row, col);
     }
 
@@ -258,7 +247,8 @@ public class ContainerElement extends StaticElement {
 
         int[] coords = getElementCell(element);
         if (coords == null) {
-            System.out.println("ELEMENT TO MOVE IS NOT IN A CELL");
+            Logger.trace("element to move is not in a cell of this container");
+            return;
         }
         int rs = coords[0];
         int cs = coords[1];
@@ -281,9 +271,11 @@ public class ContainerElement extends StaticElement {
             // because it would call the onRemove() callback for nothing
             grid[rs][cs].remove(element);
             grid[rd][cd].add(element);
+            // lock the element until the move is fulfilled by the controller
+            element.startContainerOp();
 
             element.addMoveInContainerEvent(rs,cs,rd,cd);
-            // signal the stage main.model that element is moved within the same grid so that callback can be exectued
+            // signal the stage model that element is moved within the same grid so that callback can be exectued
             gameStageModel.movedInContainer(element, this, rd, cd);
         }
     }

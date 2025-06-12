@@ -7,7 +7,7 @@ import java.util.List;
 
 public abstract class Animation {
     protected int duration; // in milliseconds
-    protected int frameGap; // CAUTION : shoud be normally boardifier.main.model.Model.frameGap to have an animation synchronized with the framerate
+    protected int frameGap; // CAUTION : shoud be normally boardifier.model.Model.frameGap to have an animation synchronized with the framerate
     // the state of the animation
     protected AnimationState state;
     // the step i.e. the index in animation at which the current animation is.

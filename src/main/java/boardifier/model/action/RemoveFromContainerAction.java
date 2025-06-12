@@ -1,8 +1,12 @@
 package boardifier.model.action;
 
+import boardifier.model.ContainerElement;
+import boardifier.model.Coord2D;
 import boardifier.model.GameElement;
 import boardifier.model.Model;
 import boardifier.model.animation.AnimationTypes;
+import boardifier.model.animation.LinearMoveAnimation;
+import boardifier.model.animation.MoveAnimation;
 import boardifier.model.animation.WaitAnimation;
 
 
@@ -17,13 +21,12 @@ public class RemoveFromContainerAction extends GameAction {
     public void execute() {
         // if the element is not within a container, do nothing
         if (element.getContainer() == null) return;
-
+        element.waitForContainerOpEnd();
         element.getContainer().removeElement(element);
         onEndCallback.execute();
     }
 
 
     public void createAnimation() {
-        animation = new WaitAnimation(model, 1);
     }
 }
