@@ -1,14 +1,40 @@
 package boardifier.view;
 
 import boardifier.control.Logger;
+import boardifier.model.Coord2D;
 import boardifier.model.GameElement;
+import javafx.geometry.Bounds;
+import javafx.geometry.Point2D;
+import javafx.scene.Group;
+import javafx.scene.Node;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Shape;
+import javafx.scene.shape.Rectangle;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.awt.*;
 
 public abstract class ElementLook {
+    /**
+     * The nodes constituting that look must be gathered within a group.*
+     */
+    private final Group group;
+    /**
+     * The list of the shapes that are used to define the look.
+     * In order to have a better collision detection, all nodes that are shapes
+     * should be added to the group with addShape(), instead of addNode().
+     * Meanwhile, those added with addNode() imply to create a rectangle shape
+     * that is added to shapes. This rectangle has the dimensions of the bounding box of the
+     * node.
+     *
+     */
+    private final List<Shape> shapes;
 
+    /**
+     * The game element associated to this look
+     */
     protected GameElement element;
-    protected String[][] shape; // a buffer of String that is used to store the visual aspect of the element
-    protected int width; // the width of the main.view port
-    protected int height; // the height of the viewport
     /**
      * the depth to enforce a particular order when painting the looks associated to game elements.
      *
@@ -18,8 +44,12 @@ public abstract class ElementLook {
      */
     protected int depth;
     /**
-     * By default, an element look is not owned by a layout. As soon as it is managed by a layout, its rendering
-     * on the viewport is managed by the layout.
+     * An ElementLook can be put directly in the Group of the RootPane. In this case parent is null.
+     * But it can also be put in a ContainerLook. In this case, parent is a reference to this containerLook.
+     * Since the location in the RootPane is given by the location of the associated GameElement, this location cannot be
+     * used directly to set the translateX a& translateY of the Group within the ElementLook. Indeed, as soon as a javafx node,
+     * including a Group, is put in another Group, its position is relative to the Group. This is why, when location of a Gameelement changes,
+     * the location of the associated ElementLook must be computed within the parent ElementLook (cf. onLocationChanged() below)
      */
     protected ElementLook parent;
 
@@ -27,12 +57,18 @@ public abstract class ElementLook {
     public static final int ANCHOR_TOPLEFT = 1;
     /**
      * define the anchor point of the look within its bounding box.
-     * By default it is set to the center of the bounding box but it can also
-     * be set to the top-left corner of the bounding box.
-     * It influences the way the look will be rendered at given x,y coordinates
+     * The anchor point has always (0,0) coordinates in the local space of the look.
+     * By default it is set to the center of the bounding box, so the top-left corner
+     *  of the bounding box has a negative x value.
+     *  It can also be set to the top-left corner of the bounding box, and in that case
+     *  the top-left corner is in (0,0)
+     * It influences the way the look will be rendered at x,y coordinates stored in the associated element.
      * If anchor is center, then the center of the look will be located in x,y.
-     * If anchor is top-left, the top-left corner of the look will be located in x,y
+     * If anchor is top-left, the top-left corner of the look will be located in x,y*
      * Some looks are easier to place when their anchor is top-left, e.g. walls.
+     *
+     * This attribute is mainly used when the look is managed by a layout, when the look
+     * must be aligned within its container cell.
      */
     protected int anchorType;
 
@@ -44,58 +80,30 @@ public abstract class ElementLook {
      */
     private RootPane rootPane;
 
-    public ElementLook(GameElement element, int width, int height, int depth) {
+    public ElementLook(GameElement element, int depth) {
         this.element = element;
-        if (width < 0) width = 0;
-        if (height < 0) height = 0;
-        this.width = width;
-        this.height = height;
-        shape = new String[height][width];
-        clearShape();
+        group = new Group();
+        group.setTranslateX(element.getX());
+        group.setTranslateY(element.getY());
+        shapes = new ArrayList<>();
         this.depth = depth;
         parent = null;
         anchorType = ANCHOR_CENTER;
         rootPane = null;
     }
 
-    public ElementLook(GameElement element, int width, int height) {
-        this(element, width, height, 0);
-    }
     public ElementLook(GameElement element) {
-        this(element, 0,0, 0);
+        this(element, 0);
     }
 
-    public int getWidth() {
-        return width;
-    }
 
-    public void setWidth(int width) {
-        this.width = width;
-    }
-
-    public int getHeight() {
-        return height;
-    }
-
-    public void setHeight(int height) {
-        this.height = height;
-    }
-
-    public void setSize(int width, int height) {
-        if (width < 0) width = 0;
-        if (height < 0) height = 0;
-        if ((this.width != width) || (this.height != height)) {
-            this.width = width;
-            this.height = height;
-            shape = new String[height][width];
-            clearShape();
-        }
+    public GameElement getElement() {
+        return element;
     }
 
     public int getDepth() {
         return depth;
     }
-
     public void setDepth(int depth) {
         this.depth = depth;
     }
@@ -109,7 +117,7 @@ public abstract class ElementLook {
     }
 
     public boolean hasParent() {
-        return parent !=null?true:false;
+        return parent!=null?true:false;
     }
 
     public int getAnchorType() {
@@ -128,73 +136,103 @@ public abstract class ElementLook {
         this.rootPane = rootPane;
     }
 
-    public GameElement getElement() {
-        return element;
+    public int getHeight() {
+        Bounds b = group.getBoundsInLocal();
+        return (int)b.getHeight();
     }
 
-    protected void clearShape() {
-        for(int i=0;i<height;i++) {
-            for(int j=0;j<width;j++) {
-                shape[i][j] = " ";
-            }
-        }
-    }
-
-    protected void printShape() {
-        for(int i=0;i<height;i++) {
-            for(int j=0;j<width;j++) {
-                System.out.print(shape[i][j]);
-            }
-            System.out.println();
-        }
-    }
-
-    public String getShapePoint(int x, int y) {
-        if (shape == null) return null;
-        if ((x>=0) && (x<width) && (y>=0) && (y<height)) return shape[y][x];
-        return null;
+    public int getWidth() {
+        Bounds b = group.getBoundsInLocal();
+        return (int)b.getWidth();
     }
 
     /**
-     * By default, if the element moves, there is nothing special to do for its look
-     * because it will be placed in the viewport taking the element x,y position int account,
-     * or by using a layout.
+     * move the location of the group within the root pane space, and thus within the scene.
+     * This method MUST NEVER be called directly. It is automatically called whenever
+     * a game element is moved in space, creating a "LocationChange" event, for example when an animation is created, or
+     * when the element is put/moved within a container. In that case, an event is created,
+     * then the controller processes this event by telling the container look to put the
+     * element look in the desired layout cell, which in returns computes the position in the
+     * root pane and then changes the location of the element. This change generates a "LocationChange" event,
+     * which is processed by the controller, and then by the gamestage view by calling this method.
      */
-    public final void onLocationChange() {}
-
-    // clear the shape if the element is not visible.
-    // and redraw it using the onLookChange callback
-    public final void onVisibilityChange() {
+    public void onLocationChange() {
+        Logger.trace("look location of ["+this+"] changed to "+element.getX()+","+element.getY());
+        group.setTranslateX(element.getX());
+        group.setTranslateY(element.getY());
+    }
+    /**
+     * show or hide the nodes of this look.
+     * This method MUST NEVER be called directly. It is automatically called whenever
+     * the visibility of a game element is changed.
+     */
+    public void onVisibilityChange() {
         boolean visible = element.isVisible();
-        if (!visible) {
-            clearShape();
-        }
-        else {
-            onFaceChange();
+        for(Node node : group.getChildren()) {
+            node.setVisible(visible);
         }
     }
 
     /**
-     * by default, do nothing because there is little chance that a text-mode game
-     * allows to "select" an element. But in case of, it can be overridden.
+     * Change the look if the associated game element is selected or unselected.
+     * By default, this method does nothing but it can be overridden in subclasses to
+     * change the aspect of node when the element is selected.
      */
-    public void onSelectionChange() {}
+    public void onSelectionChange() { }
 
-    /* By default, just "render" the look, i.e. calls render() so that it creates the array
-        that contains the visual aspect of the look.
+    public Group getGroup() {
+        return group;
+    }
 
-       WARNING: if the look is owned by a Layout, and if its size changes, then the overridden onFaceChange()
-       MUST CALL update() of the layout to recompute the layout structure.
-     */
-    public void onFaceChange() {
-        render();
+    public void clearGroup() {
+        group.getChildren().clear();
+    }
+
+    public List<Shape> getShapes() {
+        return shapes;
+    }
+
+    public void clearShapes() {
+        shapes.clear();
+    }
+    public void addShape(Shape shape) {
+        group.getChildren().add(shape);
+        shapes.add(shape);
+    }
+
+    public void addNode(Node node) {
+        // assuming that node IS NOT a Shape, create a rectangle that matches the bounds
+        Bounds b = node.getBoundsInParent();
+        Rectangle r = new Rectangle(b.getMinX(), b.getMinY(), b.getWidth(), b.getHeight());
+        r.setFill(Color.TRANSPARENT);
+        group.getChildren().add(node);
+        group.getChildren().add(r);
+        shapes.add(r);
     }
 
     /**
-     * render() is used to create the visual shape of the element. It must be defined
-     * for all types of looks. It is called automatically by onLookChange().
+     * Determine if a point is within the bounds of one of the nodes of this look
+     * @param point a point in the scene coordinate space.
+     * @return <code>true</code> if it is within, otherwise <code>false</code>.
      */
+    public boolean isPointWithin(Coord2D point) {
+        for(Node node : group.getChildren()) {
+            Bounds b = node.localToScene(node.getBoundsInParent());
+            if ( (point.getX() >= b.getMinX()) &&  (point.getX() <= b.getMaxX()) && (point.getY() >= b.getMinY()) && (point.getY() <= b.getMaxY()) ) return true;
+        }
+        return false;
+    }
 
+    /**
+     * By default, do nothing. If any change in the look must occur, this method must be overridden
+     * and its code manipulates Shape/Nodes/... created by render().
+     */
+    public void onFaceChange() {    }
+
+    /**
+     * render() is used to create the visual shape of the element
+     * It is normally called only once, when the look is added to the GameStageView
+     */
     protected abstract void render();
 
     /**
@@ -203,10 +241,13 @@ public abstract class ElementLook {
      * @param y
      */
     public void moveTo(double x, double y) {
-        // first change the location of the associated GameElement without creating a location event because
+        // first change the lcoation of the associated GameElement without creating a location event because
         // moving the look is done just after that.
         element.setLocation(x,y, false);
         // second, move the look group
-        Logger.trace("look location changed to "+x+","+y, this);
+        Logger.trace("look location of ["+this+"] changed to "+x+","+y);
+        group.setTranslateX(x);
+        group.setTranslateY(y);
     }
+
 }
