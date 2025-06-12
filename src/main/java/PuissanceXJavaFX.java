@@ -45,7 +45,7 @@ public class PuissanceXJavaFX extends Application implements GameLauncher {
         gameView = new View(model, primaryStage, rootPane);
 
         // Create the controller with the proper view
-        controller = new PuissanceXJavaFXController(model, gameView);
+        controller = new PuissanceXJavaFXController(model, gameView, this);
 
         // Now set the controller in the root pane
         rootPane.setController(controller);
@@ -116,6 +116,9 @@ public class PuissanceXJavaFX extends Application implements GameLauncher {
      */
     private void setupPlayers(int gameMode) {
         Logger.info("Setting up players for mode: " + gameMode);
+        
+        // Correction : vider la liste des joueurs avant d'en ajouter de nouveaux
+        model.getPlayers().clear();
         
         switch (gameMode) {
             case 1: // Human vs Human
