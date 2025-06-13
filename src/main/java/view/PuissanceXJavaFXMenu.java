@@ -59,6 +59,13 @@ public class PuissanceXJavaFXMenu {
         // Settings panel
         VBox settingsPanel = createSettingsPanel();
         
+        // Conservation des valeurs personnalisées lors du retour au menu
+        if (rowsSpinner != null && colsSpinner != null && winConditionSpinner != null) {
+            rowsSpinner.getValueFactory().setValue(boardRows);
+            colsSpinner.getValueFactory().setValue(boardCols);
+            winConditionSpinner.getValueFactory().setValue(winCondition);
+        }
+        
         // Buttons
         HBox buttonBox = new HBox(15);
         buttonBox.setAlignment(Pos.CENTER);

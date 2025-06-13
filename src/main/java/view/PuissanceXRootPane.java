@@ -15,7 +15,7 @@ import model.PuissanceXStageModel;
 public class PuissanceXRootPane extends RootPane {
     
     private PuissanceXJavaFXController controller;
-    private static final double CELL_SIZE = 120.0;  // Much larger cells
+    private static final double CELL_SIZE = 132.0;  // Agrandi chaque case de 10% vers la droite
     private static final double BOARD_MARGIN = 80.0;
     private static final double WINDOW_WIDTH = 1600.0;  // Much larger window
     private static final double WINDOW_HEIGHT = 1000.0;  // Much larger window
@@ -51,54 +51,65 @@ public class PuissanceXRootPane extends RootPane {
         }
         
         try {
-            // Get the game stage model to access board dimensions
-            // TODO: Fix this method call - temporarily using a workaround
-            // PuissanceXStageModel stageModel = (PuissanceXStageModel) gameStageView.getGameStageModel();
-
-            // For now, use default board dimensions
             int defaultCols = 7;
             int defaultRows = 6;
-            // Use default board dimensions for now
-            // PuissanceXBoard board = stageModel.getBoard();
 
             // Calculate which column was clicked
             double mouseX = event.getX();
             double mouseY = event.getY();
 
             // Calculate the board's position and dimensions with new layout
-            double boardStartX = BOARD_MARGIN;
-            double boardStartY = BOARD_MARGIN + 80; // Extra space for title (increased)
+            double boardStartX = BOARD_MARGIN - (CELL_SIZE / 3.0);
+            double boardStartY = BOARD_MARGIN + 80;
             double boardWidth = defaultCols * CELL_SIZE;
             double boardHeight = defaultRows * CELL_SIZE;
 
-            System.out.println("DEBUG: Mouse click at (" + mouseX + ", " + mouseY + ")");
-            System.out.println("DEBUG: Board area: X[" + boardStartX + " to " + (boardStartX + boardWidth) + "], Y[" + (boardStartY - 40) + " to " + (boardStartY + boardHeight) + "]");
+            // Debug information about click position
+            System.out.println("\n=== DEBUG CLICK POSITION ===");
+            System.out.println("Mouse click at (" + mouseX + ", " + mouseY + ")");
+            System.out.println("Board starts at X: " + boardStartX);
+            System.out.println("Board width: " + boardWidth);
+            System.out.println("Cell size: " + CELL_SIZE);
+            
+            // Calculate and display column boundaries
+            for (int i = 0; i <= defaultCols; i++) {
+                double colBoundary = boardStartX + (i * CELL_SIZE);
+                System.out.println("Column " + i + " boundary at X: " + colBoundary);
+            }
 
-            // Check if click is within the board area (including column headers)
+            // Check if click is within the board area
             if (mouseX >= boardStartX && mouseX <= boardStartX + boardWidth &&
                 mouseY >= boardStartY - 40 && mouseY <= boardStartY + boardHeight) {
 
-                // Calculate the column index with better precision
+                // Calculate the column index with improved precision
                 double relativeX = mouseX - boardStartX;
-                int col = (int) (relativeX / CELL_SIZE);
-
-                // Add some tolerance for edge cases
-                if (relativeX % CELL_SIZE > CELL_SIZE * 0.9) {
-                    col++; // If click is very close to the right edge, consider next column
-                }
-
-                System.out.println("DEBUG: Relative X: " + relativeX + ", Calculated column: " + col + " (1-based: " + (col + 1) + ")");
-
+                System.out.println("Relative X position: " + relativeX);
+                System.out.println("Relative X in cells: " + (relativeX / CELL_SIZE));
+                
+                // Calculate column with different methods for comparison
+                int colMethod1 = (int) Math.floor(relativeX / CELL_SIZE);
+                int colMethod2 = (int) Math.round(relativeX / CELL_SIZE);
+                int colMethod3 = (int) ((relativeX + CELL_SIZE/2) / CELL_SIZE);
+                
+                System.out.println("Column calculation methods:");
+                System.out.println("Method 1 (floor): " + colMethod1);
+                System.out.println("Method 2 (round): " + colMethod2);
+                System.out.println("Method 3 (center): " + colMethod3);
+                
+                // Use the most appropriate method (we'll adjust this based on your feedback)
+                int col = colMethod3; // Currently using center-based calculation
+                
                 // Ensure column is within valid range
                 if (col >= 0 && col < defaultCols) {
-                    System.out.println("DEBUG: Valid column " + (col + 1) + " clicked");
+                    System.out.println("Selected column: " + (col + 1));
                     controller.handleHumanMove(col);
                 } else {
-                    System.out.println("DEBUG: Invalid column calculated: " + col);
+                    System.out.println("Invalid column calculated: " + col);
                 }
             } else {
-                System.out.println("DEBUG: Click outside board area at (" + mouseX + ", " + mouseY + ")");
+                System.out.println("Click outside board area");
             }
+            System.out.println("=== END DEBUG ===\n");
             
         } catch (Exception e) {
             System.err.println("Error handling mouse click: " + e.getMessage());
