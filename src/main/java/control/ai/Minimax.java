@@ -20,6 +20,7 @@ public class Minimax extends PuissanceXDecider {
     private int COUNT_OPERATIONS = 0;
 
     private SimplifyBoard board;
+    private int max_depth = DEFAULT_DEPTH;
     List<Integer> DEFAULT_SEARCH_ORDER;
 
     public Minimax(Model model, Controller control) {
@@ -51,7 +52,7 @@ public class Minimax extends PuissanceXDecider {
             }
 
             makeMove(c, id);
-            scores[c] = -negamax(DEFAULT_DEPTH-1, 1-id, c, -WIN_SCORE, WIN_SCORE);
+            scores[c] = -negamax(this.max_depth-1, 1-id, c, -WIN_SCORE, WIN_SCORE);
             if (col == -1 || scores[c] > bestScore) {
                 bestScore = scores[c];
                 col = c;
