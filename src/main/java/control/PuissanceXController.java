@@ -62,7 +62,6 @@ public class PuissanceXController extends Controller {
     /**
      * Main game loop that handles player turns and game state.
      */
-    @Override
     public void stageLoop() {
         update();
         
@@ -149,7 +148,7 @@ public class PuissanceXController extends Controller {
                 PuissanceXDisk disk = new PuissanceXDisk(currentPlayer, (PuissanceXStageModel)model.getGameStage());
                 
                 // Create an action to place the disk
-                ActionList actions = ActionFactory.generatePutInContainer(model, disk, "board", row, col);
+                ActionList actions = ActionFactory.generatePutInContainer(this, model, disk, "board", row, col);
                 actions.setDoEndOfTurn(true);
                 
                 // Play the action

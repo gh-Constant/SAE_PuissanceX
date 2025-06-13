@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * boardifier.main.model.Animation.AnimationStep is a simple wrapper to represent a step of an boardifier.main.model.Animation.Animation
- * In case of boardifier.main.model.Animation.MoveAnimation, data will contain 2D/3D coordinates of the next position
+ * boardifier.model.Animation.AnimationStep is a simple wrapper to represent a step of an boardifier.model.Animation.Animation
+ * In case of boardifier.model.Animation.MoveAnimation, data will contain 2D/3D coordinates of the next position
  * In case of a LookAnimation, data will contain some parameters to modify the visual aspect.
  */
 public class AnimationStep {

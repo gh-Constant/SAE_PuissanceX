@@ -22,14 +22,23 @@ public class PuissanceXStageView extends GameStageView {
         super(name, gameStageModel);
 
         // Ajoute le callback pour chaque ajout de disque dans le board
+        // Handle disk placement in the board
         gameStageModel.onPutInContainer((element, container, row, col) -> {
             if (element instanceof PuissanceXDisk && container instanceof PuissanceXBoard) {
-                // Cherche le BoardLook déjà créé
-                BoardLook boardLook = (BoardLook) getElementLook(container);
-                if (boardLook != null) {
-                    DiskLook diskLook = new DiskLook((PuissanceXDisk) element);
-                    boardLook.addInnerLook(diskLook, row, col);
-                }
+                // Ensure this runs on the JavaFX Application Thread
+                javafx.application.Platform.runLater(() -> {
+                    try {
+                        // Find the BoardLook that was created
+                        SimpleBoardLook boardLook = (SimpleBoardLook) getElementLook(container);
+                        if (boardLook != null) {
+                            SimpleDiskLook diskLook = new SimpleDiskLook((PuissanceXDisk) element);
+                            boardLook.addInnerLook(diskLook, row, col);
+                        }
+                    } catch (Exception e) {
+                        System.err.println("Error adding disk look: " + e.getMessage());
+                        e.printStackTrace();
+                    }
+                });
             }
         });
     }
@@ -42,43 +51,21 @@ public class PuissanceXStageView extends GameStageView {
         PuissanceXStageModel model = (PuissanceXStageModel) gameStageModel;
         PuissanceXModel gameModel = (PuissanceXModel) model.getModel();
         
+        // Create JavaFX-compatible looks for all elements
+
         // Create look for the board
-        BoardLook boardLook = new BoardLook(model.getBoard());
+        SimpleBoardLook boardLook = new SimpleBoardLook(model.getBoard());
         addLook(boardLook);
-        
-        // Create look for the player text with custom formatting and column numbers
-        TextLook textLook = new TextLook(model.getPlayerText()) {
-            @Override
-            public void render() {
-                // D'abord afficher les numéros de colonnes
-                boardLook.renderColumnNumbers();
-                
-                // Puis afficher le texte du joueur
-                super.render();
-                
-                // Ajouter une ligne vide après le texte du joueur pour une meilleure lisibilité
-                System.out.println();
-            }
-        };
-        addLook(textLook);
-        
-        // Create pot looks with text labels above them
-        RedDiskPot redPot = new RedDiskPot(3, 5, gameModel.getPlayer1Pot());
-        YellowDiskPot yellowPot = new YellowDiskPot(3, 5, gameModel.getPlayer2Pot());
 
-        // Add text labels for the pots
-        TextElement redLabel = new TextElement("RED", model);
-        redLabel.setLocation(gameModel.getPlayer1Pot().getX(), gameModel.getPlayer1Pot().getY() - 1);
-        model.addElement(redLabel);
-        addLook(new TextLook(redLabel));
+        // Create look for the player text
+        TextLook playerTextLook = new TextLook(24, "BLACK", model.getPlayerText());
+        addLook(playerTextLook);
 
-        TextElement yellowLabel = new TextElement("YELLOW", model);
-        yellowLabel.setLocation(gameModel.getPlayer2Pot().getX(), gameModel.getPlayer2Pot().getY() - 1);
-        model.addElement(yellowLabel);
-        addLook(new TextLook(yellowLabel));
-        
-        // Add the pot looks
-        addLook(redPot);
-        addLook(yellowPot);
+        // Create pot looks
+        SimpleDiskPotLook redPotLook = new SimpleDiskPotLook(gameModel.getPlayer1Pot(), javafx.scene.paint.Color.RED);
+        addLook(redPotLook);
+
+        SimpleDiskPotLook yellowPotLook = new SimpleDiskPotLook(gameModel.getPlayer2Pot(), javafx.scene.paint.Color.YELLOW);
+        addLook(yellowPotLook);
     }
 }

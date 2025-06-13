@@ -2,18 +2,22 @@ package boardifier.view;
 
 import boardifier.control.Logger;
 import boardifier.model.ContainerElement;
-
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
+import javafx.scene.shape.StrokeType;
 
 public class GridLook extends ContainerLook {
 
     protected int borderWidth;
+    protected Color borderColor;
+    protected Rectangle[][] borders;
 
-    public GridLook(int rowHeight, int colWidth, ContainerElement containerElement, int depth, int borderWidth) {
-        this(rowHeight, colWidth, containerElement,depth, 0 , 0, borderWidth);
+    public GridLook(int rowHeight, int colWidth, ContainerElement containerElement, int depth, int borderWidth, Color borderColor) {
+        this(rowHeight, colWidth, containerElement,depth, 0 , 0, borderWidth, borderColor);
     }
 
-    public GridLook(int rowHeight, int colWidth, ContainerElement containerElement, int depth, int innersTop, int innersLeft, int borderWidth) {
-        super(containerElement, rowHeight + 1, colWidth + 1, depth, innersTop, innersLeft);  // Add 1 to rowHeight and colWidth
+    public GridLook(int rowHeight, int colWidth, ContainerElement containerElement, int depth, int innersTop, int innersLeft, int borderWidth, Color borderColor) {
+        super(containerElement, rowHeight, colWidth, depth, innersTop, innersLeft);
 
         // force cell dimensions to at least >= 1
         if (rowHeight < 1) {
@@ -28,129 +32,82 @@ public class GridLook extends ContainerLook {
         }
 
         this.borderWidth = borderWidth;
-        if (borderWidth > 0) {
-            setPaddingLeft(1);
-            setPaddingTop(1);
-        }
+        this.borderColor = borderColor;
+        borders = null;
     }
 
-    @Override
-    public int getHeight() {
-        int h = super.getHeight();
-        // if there are borders, it needs +1 in height to be drawn
-        if (borderWidth > 0) h++;
-        return h;
-    }
-
-    @Override
-    public int getWidth() {
-        int w = super.getWidth();
-        // if there are borders, it needs +1 in width to be drawn
-        if (borderWidth > 0) w++;
-        return w;
-    }
-
-    /**
-     * overrides default method that does nothing, because as soon as the GridLook is created,
-     * the space dedicated to the look is already fixed.
-     */
     protected void render() {
-        Logger.trace("called", this);
-        // create & clear the viewport if needed
-        setSize(getWidth(), getHeight());
-        // clear the viewport => if there are more than inners looks to render (e.g. borders), must override this method
-        clearShape();
-        renderBorders();
-        renderInners();
-    }
-
-    @Override
-    protected void computeInnersLocation() {
-        int[][] rowSpans = ((ContainerElement)element).getRowSpans();
-        int[][] colSpans = ((ContainerElement)element).getColSpans();
-        int rowStart = 0;
-        for(int i=0;i<nbRows;i++) {
-            int colStart = 0;
-            for(int j=0;j<nbCols;j++) {
-                for(ElementLook look : grid[i][j]) {
-                    // x,y are the top-left corner of the zone where the look must be put.
-                    int x = colStart + paddingLeft[i][j];
-                    // Position the disk a bit lower than before (removed the -1)
-                    int y = rowStart + paddingTop[i][j];
-                    
-                    // Move the look to the adjusted position
-                    if ((x != look.getElement().getX()) || (y != look.getElement().getY())) {
-                        look.moveTo(x, y);
-                    }
+        super.render();
+        // create borders if needed
+        if (borderWidth >= 1) {
+            borders = new Rectangle[nbRows][nbCols];
+            for(int i=0;i<nbRows;i++) {
+                for (int j = 0; j < nbCols; j++) {
+                    borders[i][j] = new Rectangle(colWidth, rowHeight, Color.TRANSPARENT);
+                    borders[i][j].setSmooth(false);
+                    borders[i][j].setStroke(borderColor);
+                    borders[i][j].setStrokeWidth(borderWidth);
+                    borders[i][j].setStrokeMiterLimit(10);
+                    borders[i][j].setStrokeType(StrokeType.CENTERED);
+                    borders[i][j].setX(innersLeft + j * colWidth);
+                    borders[i][j].setY(innersTop + i * rowHeight);
+                    addShape(borders[i][j]);
                 }
-                colStart += colsWidth[j];
             }
-            rowStart += rowsHeight[i];
+        }
+        else {
+            borders = null;
         }
     }
 
-    protected void renderBorders() {
-        if (borderWidth < 1) return;
+    /* override all methods that lead to change the inners location
+       because it also implies an update of the borders
+     */
 
-        Logger.trace("update borders", this);
+    @Override
+    public void setInnersTop(int innersTop) {
+        super.setInnersTop(innersTop);
+        updateBorders();
+    }
 
-        // start by drawing the border of each cell, which will be change after
-        for (int i = 0; i < nbRows; i++) {
-            for (int j = 0; j < nbCols; j++) {
-                int x = getCellLeft(i,j);
-                int xx = getCellRight(i,j)+1; // +1 because border is at the right of the real position
-                int y = getCellTop(i,j);
-                int yy = getCellBottom(i,j)+1; // +1 because border is below of the real position
-                //top-left corner
-                if (y==0) {
-                    if (x==0) shape[innersTop+y][innersLeft+x] = "\u2554"; // draw ╔
-                    else shape[innersTop+y][innersLeft+x] = "\u2566"; // draw ╦
-                }
-                else {
-                    if (x==0) shape[innersTop+y][innersLeft+x] = "\u2560"; // draw ╠
-                    else shape[innersTop+y][innersLeft+x] = "\u256c"; // draw ╬
-                }
+    @Override
+    public void setInnersLeft(int innersLeft) {
+        super.setInnersLeft(innersLeft);
+        updateBorders();
+    }
 
-                // top-right corner
-                if (y==0) {
-                    if (xx==getGridWidth()) shape[innersTop+y][innersLeft+xx] = "\u2557"; // draw ╗
-                    else shape[ innersTop+y][innersLeft+xx] = "\u2566"; // draw ╦
-                }
-                else {
-                    if (xx==getGridWidth()) shape[ innersTop+y][innersLeft+xx] = "\u2563"; // draw ╣
-                    else shape[ innersTop+y][innersLeft+xx] = "\u256c"; // draw ╬
-                }
+    @Override
+    public void setInnersTopLeft(int top, int left) {
+        super.setInnersTopLeft(top, left);
+        updateBorders();
+    }
 
-                //bottom-left corner
-                if (yy==getGridHeight()) {
-                    if (x==0) shape[ innersTop+yy][innersLeft+x] = "\u255A"; // draw ╚
-                    else shape[ innersTop+yy][innersLeft+x] = "\u2569"; // draw ╩
-                }
-                else {
-                    if (x==0) shape[ innersTop+yy][innersLeft+x] = "\u2560"; // draw ╠
-                    else shape[ innersTop+yy][innersLeft+x] = "\u256c"; // draw ╬
-                }
+    @Override
+    public void setRowHeight(int rowHeight) {
+        super.setRowHeight(rowHeight);
+        updateBorders();
+    }
 
-                // bottom-right corner
-                if (yy==getGridHeight()) {
-                    if (xx==getGridWidth()) shape[ innersTop+yy][innersLeft+xx] = "\u255d"; // draw ╝
-                    else shape[ innersTop+yy][innersLeft+xx] = "\u2569"; // draw ╩
-                }
-                else {
-                    if (xx==getGridWidth()) shape[ innersTop+yy][innersLeft+xx] = "\u2563"; // draw ╣
-                    else shape[ innersTop+yy][innersLeft+xx] = "\u256c"; // draw ╬
-                }
+    @Override
+    public void setColWidth(int colWidth) {
+        super.setColWidth(colWidth);
+        updateBorders();
+    }
 
-                // draw top/bottom horizontal lines
-                for (int k = x+1; k < xx; k++) {
-                    shape[ innersTop+y][innersLeft+k] = "\u2550";
-                    shape[ innersTop+yy][innersLeft+k] = "\u2550";
-                }
-                // draw left/right vertical lines
-                for (int k = y+1; k < yy; k++) {
-                    shape[innersTop+k][innersLeft+x] = "\u2551";
-                    shape[innersTop+k][innersLeft+xx] = "\u2551";
-                }
+    protected void updateBorders() {
+        /* if borders have not been already created, do nothing
+          This case occurs when inherting from this class and the constructor calls
+          a method that leads to a call to updateBorders() while render() has not been yet called.
+          For example, setting paddings is in this case.
+         */
+        if (borders == null) return;
+
+        for(int i=0;i<nbRows;i++) {
+            for(int j=0;j<nbCols;j++) {
+                borders[i][j].setWidth(colWidth);
+                borders[i][j].setHeight(rowHeight);
+                borders[i][j].setX(innersLeft+j*colWidth);
+                borders[i][j].setY(innersTop+i*rowHeight);
             }
         }
     }

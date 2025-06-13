@@ -7,12 +7,12 @@ public abstract class GameStageModel {
     
     /**
      * The local state of the stage.
-     * This state is different from the global state that is defined in main.model.
+     * This state is different from the global state that is defined in model.
      */
     protected int state; // the local state of the stage.
     /**
-     * The parent main.model.
-     * Obviously, the main.model must be instantiated BEFORE the game stage.
+     * The parent model.
+     * Obviously, the model must be instantiated BEFORE the game stage.
      */
     protected Model model;
 
@@ -180,7 +180,7 @@ public abstract class GameStageModel {
         onRemoveFromContainerCallback.execute(element, container, row, col);
     }
 
-    // by default removing = hide the element and move it outside the current scope of the main.view
+    // by default removing = hide the element and move it outside the current scope of the view
     public void removeElement(GameElement element) {
         element.setLocation(-10000,-10000);
         element.setVisible(false);
@@ -189,14 +189,20 @@ public abstract class GameStageModel {
         }
     }
 
-    /* ********************************
-       Helpers methods
-    ******************************** */
+    /* *******************************
+       Trampoline methods
+    ********************************* */
+
+    public Player getCurrentPlayer() {
+        return model.getCurrentPlayer();
+    }
 
     public String getCurrentPlayerName() {
         return model.getCurrentPlayerName();
     }
-
+    /* ********************************
+       Helpers methods
+    ******************************** */
     // get the container element (if it exists) where is assigned another element
     public ContainerElement elementContainer(GameElement element) {
         for(ContainerElement container : containers) {
@@ -210,7 +216,6 @@ public abstract class GameStageModel {
         for (int i = 0; i < elements.size(); i++) {
             GameElement element = elements.get(i);
             if (element.type == type) {
-                //System.out.println("found");
                 list.add(element);
             }
         }

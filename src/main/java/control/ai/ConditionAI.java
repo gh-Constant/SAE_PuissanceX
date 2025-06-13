@@ -135,7 +135,7 @@ public class ConditionAI extends PuissanceXDecider {
         // Vérifier si l'adversaire peut gagner
         if (simpBoard.checkWin(row, col, model.getWinCondition())) {
             PuissanceXDisk disk = new PuissanceXDisk(iaId, stageModel);
-            ActionList actions = ActionFactory.generatePutInContainer(model, disk, "board", row, col);
+            ActionList actions = ActionFactory.generatePutInContainer(control, model, disk, "board", row, col);
             actions.setDoEndOfTurn(true);
 
             // Supprime le coup simulé de l'adversaire
@@ -153,7 +153,7 @@ public class ConditionAI extends PuissanceXDecider {
         // Vérifier si ce placement crée une victoire
         if (simpBoard.checkWin(row, col, model.getWinCondition())) {
             PuissanceXDisk disk = new PuissanceXDisk(iaId, stageModel);
-            ActionList actions = ActionFactory.generatePutInContainer(model, disk, "board", row, col);
+            ActionList actions = ActionFactory.generatePutInContainer(control, model, disk, "board", row, col);
             actions.setDoEndOfTurn(true);
 
             // Supprimer le coup temporaire

@@ -17,7 +17,15 @@ import boardifier.model.animation.Animation;
  */
 public abstract class GameElement {
 
-    // coordinates of the element
+    /**
+     * coordinates of the element. These are "virtual" coordinates but they are used during rendering the view
+     * to determine the position of looks on the RootPane. There si a 1:1 mapping, meaning that if x,y = 50,100
+     * then the element is placed in 50,100 within the RootPane space (NB : which is not always the Scene space because
+     * of an eventual menu bar).
+     * Nevertheless, when a look is within another one, x,y is not directly used tu set the position of the look.
+     * coordinates within the parent element must be compute, and these coordinates are sued to move the look so that
+     * it is put at the desired place in the RootPane.
+     */
     protected double x;
     protected double y;
 
@@ -68,6 +76,7 @@ public abstract class GameElement {
     protected EventQueue eventQueue;
 
     protected boolean inContainerOp;
+
     /**
      * Basic constructor.
      * <p>
@@ -127,6 +136,28 @@ public abstract class GameElement {
         animation = null;
 
         eventQueue = new EventQueue();
+
+        inContainerOp = false;
+    }
+
+    public synchronized void waitForContainerOpEnd() {
+        while (inContainerOp) {
+            try {
+                wait();
+            }
+            catch(InterruptedException e) {}
+        }
+    }
+
+    public synchronized void signalContainerOpEnd() {
+        if (inContainerOp) {
+            inContainerOp = false;
+            notifyAll();
+        }
+    }
+
+    public synchronized void startContainerOp() {
+        inContainerOp = true;
     }
 
     public EventQueue getEventQueue() {
@@ -171,6 +202,11 @@ public abstract class GameElement {
      * the main group of the look is moved to the same location. It implies that
      * the scene will be repainted with the new location of the look.
      *
+     * In some cases (moving element within a container), the MVC is not totally respected
+     * because the view must update the element location. In such a case, there is no need to create
+     * a ChangeLocationEvent because the look of the element has already been move. In such cases,
+     * doEvent must be false;
+     *
      * @param x The x location in space
      * @param y The y location in space
      */
@@ -183,9 +219,17 @@ public abstract class GameElement {
         }
     }
 
+    /**
+     * do the event by default
+     * @param x
+     * @param y
+     */
     public void setLocation(double x, double y) {
-        setLocation(x, y, true);
+        setLocation(x,y,true);
     }
+
+
+
     /**
      * Set the location with a relative move of dx,dy.
      * This method can be used when a sprite with a speed expressed in dx,dy must be moved.
@@ -257,7 +301,7 @@ public abstract class GameElement {
             eventQueue.addChangeSelectionEvent();
         }
 
-        // update game stage main.model set of selected elements
+        // update game stage model set of selected elements
         gameStageModel.setSelected(this, true);
         this.selected = true;
     }
@@ -273,7 +317,7 @@ public abstract class GameElement {
         if (this.selected) {
             eventQueue.addChangeSelectionEvent();
         }
-        // update game stage main.model set of selected elements
+        // update game stage model set of selected elements
         gameStageModel.setSelected(this, false);
         this.selected = false;
     }
@@ -406,14 +450,20 @@ public abstract class GameElement {
     /**
      * Update the element.
      * This method will be called at each frame. It can be used to update the location of the element,
-     * its state, or any other attribute that is defined in its class.*
+     * its state, or any other attribute that is defined in its class.
+     * It is mainly used to define the behaviour of the element during an animation.
+     * Note that it should normally contain only code that is based on the element state, and not the whole stage state.
+     * For example, in a game with 10 turns, if a text element must appear only during the two last turns, then the regular procedure is
+     * to have a counter of turns in the stage model that decreases at each turn. When the controller detects that there is 2 turns left,
+     * it tells to the game stage to set the text as visible, which should generate a ChangeVisibility event, and thus yield to see the
+     * text after the next root pane update.
      */
     public void update() {
     }
 
     /* *********************************************
        TRAMPOLINE METHODS
-       NB: gain access to the current main.model
+       NB: gain access to the current model
      ********************************************* */
     public Model getModel() {
         return gameStageModel.getModel();

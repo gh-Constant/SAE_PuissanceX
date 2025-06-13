@@ -3,10 +3,22 @@ package boardifier.view;
 import boardifier.control.Logger;
 import boardifier.model.ContainerElement;
 import boardifier.model.Coord2D;
+import javafx.geometry.Point2D;
 
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * ContainerLook defines a look that matches the associated ContainerElement structure,
+ * with cells filled with looks that matches the GameElement that are put within the ContainerElement.
+ * Cells have a transparent bakcground and no borders.
+ * By default, the size of the cells is automatically computed from the size of the looks within.
+ * But if it also possible to fix the size of a cell, using the dedicated constructor. In that case,
+ * if looks are bigger than the cell size, they will overlap on other cells.
+ * If the container has spanning cells, then ContainerLook will also use it to compute the location
+ * of looks. If cell size is fixed, the size of spanning cells is just a multiple of a single cell size.
+ *
+ */
 public class ContainerLook extends ElementLook {
 
     protected int nbRows;
@@ -57,8 +69,6 @@ public class ContainerLook extends ElementLook {
      * @param depth
      */
     public ContainerLook(ContainerElement containerElement, int rowHeight, int colWidth, int depth, int innersTop, int innersLeft) {
-        // there is a +1 on the size to be able to put the rigth/bottom border
-        // and a +2 if the coords of the cells is shown
         super(containerElement);
         // force sizes to coherent values
         if (rowHeight < -1) rowHeight = -1;
@@ -356,13 +366,13 @@ public class ContainerLook extends ElementLook {
         }
     }
 
-    protected int getGridWidth() {
+    private int getGridWidth() {
         int w = 0;
         for(int j=0;j<nbCols;j++) w += colsWidth[j];
         return w;
     }
 
-    protected int getGridHeight() {
+    private int getGridHeight() {
         int h = 0;
         for(int i=0;i<nbRows;i++) h += rowsHeight[i];
         return h;
@@ -451,8 +461,8 @@ public class ContainerLook extends ElementLook {
             max = 0;
             for(int i=0;i<nbRows;i++) {
                 if ( ((colSpans[i][j]) == 1) && (!grid[i][j].isEmpty())) {
-                    int w = getCellLookMaxWidth(i,j) +paddingLeft[i][j] + paddingRight[i][j];
-                    if (w > max) max = w;
+                int w = getCellLookMaxWidth(i,j) +paddingLeft[i][j] + paddingRight[i][j];
+                if (w > max) max = w;
                 }
             }
             colsWidth[j] = max;
@@ -484,8 +494,11 @@ public class ContainerLook extends ElementLook {
            But before that, its position relative to the RootPane must be computed
          */
         Coord2D pos = getRootPane().getRootPaneLocationFromLookLocation(look);
+        // now remove the loook group from this group
+        getGroup().getChildren().remove(look.getGroup());
         // move the look group to its "new" position in the RootPane
         look.moveTo(pos.getX(), pos.getY());
+        getRootPane().attachLookToRootPane(look);
     }
 
     public void addInnerLook(ElementLook look, int row, int col) {
@@ -501,6 +514,9 @@ public class ContainerLook extends ElementLook {
             c = -colSpans[row][col];
         }
         grid[r][c].add(look);
+        Logger.trace("added in ["+this+"] the look ["+look+"] in "+row+","+col);
+        // adding the look group to this container look group
+        getGroup().getChildren().add(look.getGroup());
         look.setParent(this);
         updateInners();
     }
@@ -558,66 +574,33 @@ public class ContainerLook extends ElementLook {
 
     public void updateInners(boolean rowColUpdate) {
 
-        Logger.trace("called", this);
+        Logger.trace("called for ["+this+"]");
         if (rowColUpdate) {
             updateRowHeight();
             updateColWidth();
-
+            Logger.trace("for ["+this+"] - change in the structure => call parent updateInners()");
             // if size changes, then other ContainerLook may also be impacted
             ContainerLook up = (ContainerLook) parent;
             // back to the top to propagate changes
             while (up != null) {
-                Logger.trace("change in the structure => call parent updateInners()", this);
                 up.updateInners();
                 up = (ContainerLook) up.parent;
             }
         }
-        // now render the inners looks
         computeInnersLocation();
     }
 
     @Override
     public void onFaceChange() {
-        Logger.trace("called", this);
+        Logger.trace(" for ["+this+"] - called because of new spanning or change in reachabloe cells. Just update inners location");
         updateInners();
     }
 
     protected void render() {
-        Logger.trace("called", this);
-        // create & clear the viewport if needed
-        setSize(getWidth(), getHeight());
-        // clear the viewport => if there are more than inners looks to render (e.g. borders), must override this method
-        clearShape();
-        renderInners();
-    }
-
-    protected void renderInners() {
-        for(int i=0;i<nbRows;i++) {
-            for(int j=0;j<nbCols;j++) {
-                for(ElementLook look : grid[i][j]) {
-                    // render the look to its internal shape array
-                    look.render();
-                    // copy this array within the array of this container
-                    double lookX = innersLeft + look.getElement().getX();
-                    double lookY = innersTop + look.getElement().getY();
-                    // render the look shape, taking care of not going out of the layout space.
-                    for (int k = 0; k < look.getHeight(); k++) {
-                        for (int l = 0; l < look.getWidth(); l++) {
-                            if ((lookY + k < getHeight()) && (lookX + l < getWidth())) {
-                                String s = look.getShapePoint(l, k);
-                                if ((s != null) && (!" ".equals(s))) {
-                                    shape[(int)lookY + k][(int)lookX + l] = s;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
+        Logger.trace(" for ["+this+"] - this msg should not be displayed except when it is added to the gamestage. This method does nothing since there is nothing to create");
     }
 
     protected void computeInnersLocation() {
-
         int[][] rowSpans = ((ContainerElement)element).getRowSpans();
         int[][] colSpans = ((ContainerElement)element).getColSpans();
         int rowStart = 0;
@@ -651,23 +634,29 @@ public class ContainerLook extends ElementLook {
                     } else if (horizontalAlignment[i][j] == ALIGN_RIGHT) {
                         x = xx - look.getWidth() + 1;
                     }
+                    // move the look shape to its correct location within the rootpane
+                    // knowing that x,y is the top-left corner in the local layout space
+                    double lookX = innersLeft +x;
+                    double lookY = innersTop +y;
                     // if anchor is at center, add size/2 so that the center of the look
                     // is at the right place.
                     if (look.getAnchorType() == ElementLook.ANCHOR_CENTER) {
-                        x += look.getWidth()/2;
-                        y += look.getHeight()/2;
+                        lookX += look.getWidth()/2;
+                        lookY += look.getHeight()/2;
                     }
-                    // move the look shape to its correct location within the container cells
-                    // knowing that x,y is the top-left corner in the local grid (i.e. not counting innerTop/Left)
-                    if ((x != look.getElement().getX()) || (y != look.getElement().getY())) {
-                        look.moveTo(x, y);
+
+                    if ((lookX != look.getElement().getX()) || (lookY != look.getElement().getY())) {
+                        look.moveTo(lookX, lookY);
                     }
+
                 }
                 colStart += colsWidth[j];
             }
             rowStart += rowsHeight[i];
         }
     }
+
+
 
     public int getCellLeft(int row, int col) {
         int[][] rowSpans = ((ContainerElement)element).getRowSpans();
@@ -712,20 +701,134 @@ public class ContainerLook extends ElementLook {
         return y-1;
     }
 
-/* *****************************************************
-    REMINDER COMMENT
-    Methods that are defined in boardifier but useless for boardifierconsole
+    public int[] getCellFromSceneLocation(Coord2D p) {
+        return getCellFromSceneLocation(p.getX(), p.getY());
+    }
 
-    public int[] getCellFromSceneLocation(Coord2D p) {}
-    public int[] getCellFromSceneLocation(double x, double y) {}
+    public int[] getCellFromSceneLocation(double x, double y) {
+        // get the group node that contains the shapes/nodes of this grid and get the coordinates of p within this group
+        Point2D inMyGroup = getGroup().sceneToLocal(x, y);
+        int innersX = (int)inMyGroup.getX() - innersLeft;
+        int innersY = (int)inMyGroup.getY() - innersTop;
+        return getCellFromInnersLocation(innersX, innersY);
+    }
 
-    public Coord2D getContainerLocationForLookFromCell(ElementLook look, int row, int col) {}
+    /**
+     * get the location in the local space for an element that is already in this container
+     * and that must be put in cell row,col. It is used in controllers when a MoveWithinContainerAction must be build.
+     * If the look is not in this container, it returns its current location
+     *
+     * @param look
+     * @param row
+     * @param col
+     * @return
+     */
+    public Coord2D getContainerLocationForLookFromCell(ElementLook look, int row, int col) {
 
-    public Coord2D getRootPaneLocationForLookFromCell(ElementLook look, int row, int col) {}
+        // get position in the layout local space
+        Coord2D pos = getLookLocationInCell(look, row, col);
+        // add the position of the inners in the container
+        pos.relativeMove(innersLeft, innersTop);
 
-    public int[] getCellFromInnersLocation(double x, double y) {}
+        return pos;
+    }
 
-    public Coord2D getLookLocationInCell(ElementLook look, int row, int col) {}
+    /**
+     * get the location in the RootPane space for an element that is already in the RootPane (i.e. with no parent container)
+     * and that must be put in cell row,col of this container. It is used in controllers when a PutInContainerAction must be build.
+     *
+     * @param look
+     * @param row
+     * @param col
+     * @return
+     */
+    public Coord2D getRootPaneLocationForLookFromCell(ElementLook look, int row, int col) {
+        // get position in the layout local space
+        Coord2D pos = getLookLocationInCell(look, row, col);
+        // add the position of the inners in the container
+        pos.relativeMove(innersLeft, innersTop);
 
-    ********************************************************** */
+        // get the gap between the RootPane group and this containerLook group.
+        Point2D posGroupSrc = getRootPane().localToScene(0,0);
+        Point2D posGroupDest = getGroup().localToScene(0,0);
+        double gapX = posGroupDest.getX() - posGroupSrc.getX();
+        double gapY = posGroupDest.getY() - posGroupSrc.getY();
+        // add the gap to pos
+        pos.relativeMove(gapX, gapY);
+
+        return pos;
+    }
+
+
+    /**
+     * computes the row,col of a cell from x,y coordinates in the local space of the inners
+     * @param x
+     * @param y
+     * @return
+     */
+    public int[] getCellFromInnersLocation(double x, double y) {
+        if ((x < 0) || (x >= getWidth()) || (y < 0) || (y >= getHeight())) return null;
+        for(int i=0;i<nbRows; i++) {
+            for(int j=0;j<nbCols;j++) {
+                int x1 = getCellLeft(i,j);
+                if (x1 == -1) continue;
+                int x2 = getCellRight(i,j);
+                int y1 = getCellTop(i,j);
+                int y2 = getCellBottom(i,j);
+
+                if ((x>=x1) && (x<=x2) && (y>= y1) && (y<=y2)) return new int[]{i,j};
+            }
+        }
+        return null;
+    }
+
+    /**
+     * get the location in the inners for a look that would b place in row,col cell
+     * @param look
+     * @param row
+     * @param col
+     * @return
+     */
+    public Coord2D getLookLocationInCell(ElementLook look, int row, int col) {
+
+        int[][] rowSpans = ((ContainerElement)element).getRowSpans();
+        int[][] colSpans = ((ContainerElement)element).getColSpans();
+
+        int rowStart = 0;
+        int colStart = 0;
+        for(int i=0;i<row;i++) rowStart += rowsHeight[i];
+        for(int j=0;j<col;j++) colStart += colsWidth[j];
+
+        int x = colStart + paddingLeft[row][col];
+        int y = rowStart + paddingTop[row][col];
+        // xx,yy are the bottom-right corner, in case of there is no spanning
+        int w = 0;
+        for(int k=0;k<colSpans[row][col];k++) {
+            w += colsWidth[col+k];
+        }
+        int xx = colStart + w - paddingRight[row][col] - 1;
+        int h = 0;
+        for(int k=0;k<rowSpans[row][col];k++) {
+            h += rowsHeight[row+k];
+        }
+        int yy = rowStart + h - paddingBottom[row][col] - 1;
+
+        // modify taking alignment into account
+        if (verticalAlignment[row][col] == ALIGN_MIDDLE) {
+            y = y + (yy - y + 1 - look.getHeight()) / 2;
+        } else if (verticalAlignment[row][col] == ALIGN_BOTTOM) {
+            y = yy - look.getHeight() + 1;
+        }
+        if (horizontalAlignment[row][col] == ALIGN_CENTER) {
+            x = x + (xx - x + 1 - look.getWidth()) / 2;
+        } else if (horizontalAlignment[row][col] == ALIGN_RIGHT) {
+            x = xx - look.getWidth() + 1;
+        }
+        if (look.getAnchorType() == ElementLook.ANCHOR_CENTER) {
+            x += look.getWidth()/2;
+            y += look.getHeight()/2;
+        }
+        return new Coord2D(x,y);
+    }
+
 }

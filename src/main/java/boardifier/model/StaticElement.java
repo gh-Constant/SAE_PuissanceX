@@ -1,7 +1,7 @@
 package boardifier.model;
 
 /*
- boardifier.main.model.StaticElement class :
+ boardifier.model.StaticElement class :
  Describes an element of the game that will never move and
  never update for example the background image.
  */
