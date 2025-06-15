@@ -63,7 +63,7 @@ public class ConditionAI extends PuissanceXDecider {
 
         // Priorité aux colonnes qui permettent un alignement de 3
         int bestCol = -1;
-        int maxAlign = -1;
+        int maxAlign = 1;
 
         List<Integer> colsToCheck;
         if (safeMoves.isEmpty()) {
