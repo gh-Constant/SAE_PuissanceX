@@ -2,9 +2,9 @@ name: Java Console Build
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "version-console" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "version-console" ]
 
 jobs:
   build-console:
