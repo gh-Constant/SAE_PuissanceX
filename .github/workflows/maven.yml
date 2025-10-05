@@ -3,6 +3,7 @@ name: Java Console Build
 on:
   push:
     branches: [ "version-console" ]
+    tags: [ "version-console" ]  # or [ "*" ] for any tag
   pull_request:
     branches: [ "version-console" ]
 
